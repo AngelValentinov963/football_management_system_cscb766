@@ -1,66 +1,75 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"]</title>
+    <title>@ViewData["Title"] - FC Manager</title>
 
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
-
 <body>
 
     @{
         var controller = ViewContext.RouteData.Values["controller"]?.ToString();
         var action = ViewContext.RouteData.Values["action"]?.ToString();
+        bool isLogin = controller == "Account" && action == "Login";
+
+        string IsActive(string c) => controller == c ? "active" : "";
     }
 
-    <div class="d-flex" id="wrapper">
+    @if (isLogin)
+    {
+        <div class="login-shell">
+            @RenderBody()
+        </div>
+    }
+    else
+    {
+        <div id="wrapper">
 
-        @if (!(controller == "Account" && action == "Login"))
-        {
-            <!-- SIDEBAR -->
-            <div id="sidebar" class="bg-dark text-white">
-
+            <aside id="sidebar">
                 <div class="p-3">
 
-                    <button class="btn btn-outline-light mb-3" id="toggleBtn">
-                        ⚽
-                    </button>
-
-                    <div class="sidebar-content">
-                        <a class="d-block text-white mb-2" asp-controller="Home" asp-action="Index">Home</a>
-                        <a class="d-block text-white mb-2" asp-controller="Teams" asp-action="Index">Teams</a>
-                        <a class="d-block text-white mb-2" asp-controller="Player" asp-action="Index">Players</a>
-                        <a class="d-block text-white mb-2" asp-controller="Squad" asp-action="Index">Squad</a>
-                        <a class="d-block text-white mb-2" asp-controller="Fixtures" asp-action="Index">Fixtures</a>
-                        <a class="d-block text-white mb-2" asp-controller="Tactics" asp-action="Index">Tactics</a>
-                        <a class="d-block text-white mb-2" asp-controller="Play" asp-action="Index">Play</a>
-                        <a class="d-block text-white mb-2" asp-controller="Account" asp-action="Logout">Logout</a>
-
+                    <div class="brand">
+                        <div class="brand-mark">⚽</div>
+                        <div class="brand-text">
+                            FC Manager
+                            <small>Season 25/26</small>
+                        </div>
                     </div>
 
+                    <button class="btn btn-outline-light" id="toggleBtn" title="Collapse sidebar">
+                        <span>☰</span>
+                    </button>
+
+                    <nav class="sidebar-content">
+                        <a class="@IsActive("Home")"    asp-controller="Home"    asp-action="Index"><span class="nav-label">Dashboard</span></a>
+                        <a class="@IsActive("Teams")"   asp-controller="Teams"   asp-action="Index"><span class="nav-label">Teams</span></a>
+                        <a class="@IsActive("Player")"  asp-controller="Player"  asp-action="Index"><span class="nav-label">Players</span></a>
+                        <a class="@IsActive("Squad")"   asp-controller="Squad"   asp-action="Index"><span class="nav-label">Squad</span></a>
+                        <a class="@IsActive("Fixtures")" asp-controller="Fixtures" asp-action="Index"><span class="nav-label">Fixtures</span></a>
+                        <a class="@IsActive("Tactics")" asp-controller="Tactics" asp-action="Index"><span class="nav-label">Tactics</span></a>
+                        <a class="@IsActive("Market")"  asp-controller="Market"  asp-action="Index"><span class="nav-label">Market</span></a>
+                        <a class="@IsActive("Play")"    asp-controller="Play"    asp-action="Index"><span class="nav-label">Play</span></a>
+                        <a asp-controller="Account" asp-action="Logout"><span class="nav-label">Logout</span></a>
+                    </nav>
+
                 </div>
+            </aside>
 
-            </div>
-        }
-
-        <!-- PAGE CONTENT -->
-        <div id="page-content">
-
-            @RenderBody()
+            <main id="page-content">
+                @RenderBody()
+            </main>
 
         </div>
-
-    </div>
+    }
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-
     <script>
         document.getElementById("toggleBtn")?.addEventListener("click", function () {
-        document.getElementById("sidebar").classList.toggle("collapsed");
+            document.getElementById("sidebar").classList.toggle("collapsed");
         });
     </script>
 

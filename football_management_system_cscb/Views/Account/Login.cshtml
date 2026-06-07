@@ -1,36 +1,41 @@
-﻿@model football_management_system_cscb.ViewModels.LoginViewModel
+@model football_management_system_cscb.ViewModels.LoginViewModel
+@{
+    ViewData["Title"] = "Sign in";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
 
-<div class="container d-flex justify-content-center align-items-center" style="height: 80vh;">
+<div class="card login-card">
 
-    <div class="card shadow p-4" style="width: 350px; border-radius: 12px;">
-
-        <h3 class="text-center mb-4">Login</h3>
-
-        <form asp-action="Login" method="post">
-
-            <div class="mb-3">
-                <label class="form-label">Username</label>
-                <input asp-for="Username" class="form-control" />
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Password</label>
-                <input asp-for="Password" type="password" class="form-control" />
-            </div>
-
-            @if (ViewBag.Error != null)
-            {
-                <div class="alert alert-danger">
-                    @ViewBag.Error
-                </div>
-            }
-
-            <button type="submit" class="btn btn-primary w-100">
-                Login
-            </button>
-
-        </form>
-
+    <div class="login-brand">
+        <div class="brand-mark">⚽</div>
+        <div class="brand-text" style="font-size:18px;">
+            FC Manager
+            <small>Coach Portal</small>
+        </div>
     </div>
+
+    <h3>Welcome back</h3>
+    <p class="login-sub">Sign in to manage your club</p>
+
+    <form asp-action="Login" method="post">
+
+        <div class="mb-3">
+            <label class="form-label">Username</label>
+            <input asp-for="Username" class="form-control" autocomplete="username" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input asp-for="Password" type="password" class="form-control" autocomplete="current-password" />
+        </div>
+
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert alert-danger py-2">@ViewBag.Error</div>
+        }
+
+        <button type="submit" class="btn btn-primary w-100 mt-2">Sign in</button>
+
+    </form>
 
 </div>

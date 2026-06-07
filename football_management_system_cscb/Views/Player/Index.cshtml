@@ -1,59 +1,39 @@
 @model IEnumerable<football_management_system_cscb.ViewModels.PlayerViewModel>
+@{ ViewData["Title"] = "Players"; }
 
-<div class="page-wrapper">
-
-    <div class="player-table card shadow-sm">
-
-        <div class="table-responsive scroll-table">
-
-            <table class="table table-hover align-middle mb-0">
-
-                <thead>
-                    <tr>
-                        <th>Player</th>
-                        <th>Age</th>
-                        <th>Nationality</th>
-                        <th>Position</th>
-                        <th>OVR</th>
-                        <th>POT</th>
-                        <th>Value</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    @foreach (var player in Model)
-                    {
-                        <tr>
-                            <td>
-                                <strong>@player.FullName</strong>
-                                <div class="text-muted small">ID: @player.PlayerId</div>
-                            </td>
-
-                            <td>
-                                @(DateTime.Today.Year - player.BirthDate.Year)
-                            </td>
-
-                            <td>@player.Nationality</td>
-
-                            <td>
-                                <span class="position-badge">
-                                    @player.PreferredPosition
-                                </span>
-                            </td>
-
-
-
-                            <td>
-                                €@string.Format("{0:N0}", player.MarketValue ?? 0)
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-
-            </table>
-
-        </div>
-
+<div class="page-header">
+    <div>
+        <h1>Players</h1>
+        <p class="subtitle">Browse and scout the full player pool.</p>
     </div>
+</div>
 
+<div class="player-table card">
+    <div class="table-responsive scroll-table">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Player</th>
+                    <th>Age</th>
+                    <th>Nationality</th>
+                    <th>Position</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var player in Model)
+                {
+                    <tr>
+                        <td>
+                            <strong>@player.FullName</strong>
+                        </td>
+                        <td>@(DateTime.Today.Year - player.BirthDate.Year)</td>
+                        <td>@player.Nationality</td>
+                        <td><span class="position-badge">@player.PreferredPosition</span></td>
+                        <td>€@string.Format("{0:N0}", player.MarketValue ?? 0)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 </div>
