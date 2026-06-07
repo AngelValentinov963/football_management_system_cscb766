@@ -1,0 +1,233 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.card-img-top {
+    height: 180px;
+    object-fit: cover;
+}
+
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+body {
+    margin: 0;
+    height: 100vh;
+    overflow: hidden;
+}
+
+    body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: url('/images/football-bg.jpg');
+        background-size: cover;
+        background-position: center;
+        filter: blur(8px);
+        transform: scale(1.1); /* prevents edge cut after blur */
+
+        z-index: -1;
+    }
+    body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.3);
+        z-index: -1;
+    }
+
+.page-wrapper {
+    height: 100vh;
+    padding: 10vh 5vw; /* 👈 this creates your "20% breathing space" */
+    box-sizing: border-box;
+}
+
+.scroll-table {
+    height: 100%; /* fills remaining space */
+    overflow-y: auto; /* enables scrolling */
+    border-radius: 10px;
+}
+
+.scroll-table {
+    max-height: 80vh;
+    overflow-y: auto;
+}
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+#wrapper {
+    display: flex;
+}
+
+/* SIDEBAR FULL */
+#sidebar {
+    width: 220px;
+    min-height: 100vh;
+    transition: 0.3s;
+}
+
+    /* COLLAPSED SIDEBAR */
+    #sidebar.collapsed {
+        width: 70px;
+    }
+
+        /* hide text when collapsed */
+        #sidebar.collapsed .sidebar-content {
+            display: none;
+        }
+
+/* content area */
+#page-content {
+    flex: 1;
+    padding: 20px;
+}
+
+/* links */
+#sidebar a {
+    text-decoration: none;
+    padding: 6px;
+    display: block;
+    border-radius: 6px;
+}
+
+    #sidebar a:hover {
+        background: #2c2c2c;
+    }
+
+.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
+  color: var(--bs-secondary-color);
+  text-align: end;
+}
+
+.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
+  text-align: start;
+}
+
+
+.fm-wrapper {
+    padding: 18px;
+    background: #0f172a; /* dark FM-style background */
+    min-height: 100vh;
+}
+
+/* Table container */
+.fm-table {
+    background: #111827;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,.4);
+}
+
+    /* Table base */
+    .fm-table table {
+        color: #e5e7eb;
+    }
+
+    /* Header */
+    .fm-table thead {
+        background: #0b1220;
+        color: #9ca3af;
+        text-transform: uppercase;
+        font-size: 12px;
+        letter-spacing: 1px;
+    }
+
+    .fm-table th {
+        padding: 12px;
+        border: none;
+    }
+
+/* Rows */
+.fm-row {
+    transition: 0.15s ease;
+}
+
+    .fm-row:hover {
+        background: #1f2937;
+        cursor: pointer;
+    }
+
+/* Player name */
+.player-name {
+    font-weight: 600;
+    color: white;
+}
+
+/* Position badge */
+.badge-pos {
+    background: #1e3a8a;
+    color: #93c5fd;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+}
+
+/* Ratings (FM style bars) */
+.rating-bar {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 700;
+    display: inline-block;
+    min-width: 38px;
+    text-align: center;
+}
+
+/* Ability colors */
+.elite {
+    background: #16a34a;
+    color: white;
+}
+
+.good {
+    background: #2563eb;
+    color: white;
+}
+
+.ok {
+    background: #f59e0b;
+    color: black;
+}
+
+.bad {
+    background: #dc2626;
+    color: white;
+}
+
+/* Value */
+.value {
+    color: #34d399;
+    font-weight: 600;
+}
+
+
+
+.position-badge {
+    background: #1e3a8a;
+    color: #93c5fd;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+}
+
+.rating.good {
+    color: #22c55e;
+    font-weight: bold;
+}
+
+.rating.normal {
+    color: #f59e0b;
+    font-weight: bold;
+}

@@ -1,0 +1,68 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+
+<body>
+
+    @{
+        var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+        var action = ViewContext.RouteData.Values["action"]?.ToString();
+    }
+
+    <div class="d-flex" id="wrapper">
+
+        @if (!(controller == "Account" && action == "Login"))
+        {
+            <!-- SIDEBAR -->
+            <div id="sidebar" class="bg-dark text-white">
+
+                <div class="p-3">
+
+                    <button class="btn btn-outline-light mb-3" id="toggleBtn">
+                        ⚽
+                    </button>
+
+                    <div class="sidebar-content">
+                        <a class="d-block text-white mb-2" asp-controller="Home" asp-action="Index">Home</a>
+                        <a class="d-block text-white mb-2" asp-controller="Teams" asp-action="Index">Teams</a>
+                        <a class="d-block text-white mb-2" asp-controller="Player" asp-action="Index">Players</a>
+                        <a class="d-block text-white mb-2" asp-controller="Squad" asp-action="Index">Squad</a>
+                        <a class="d-block text-white mb-2" asp-controller="Fixtures" asp-action="Index">Fixtures</a>
+                        <a class="d-block text-white mb-2" asp-controller="Tactics" asp-action="Index">Tactics</a>
+                        <a class="d-block text-white mb-2" asp-controller="Play" asp-action="Index">Play</a>
+                        <a class="d-block text-white mb-2" asp-controller="Account" asp-action="Logout">Logout</a>
+
+                    </div>
+
+                </div>
+
+            </div>
+        }
+
+        <!-- PAGE CONTENT -->
+        <div id="page-content">
+
+            @RenderBody()
+
+        </div>
+
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.getElementById("toggleBtn")?.addEventListener("click", function () {
+        document.getElementById("sidebar").classList.toggle("collapsed");
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,174 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<style>
+    .dashboard-card {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+
+    .dashboard-card .card {
+        transition: all 0.25s ease;
+        overflow: hidden;
+        height: 100%;
+    }
+
+    .dashboard-card:hover .card {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+    }
+
+    .dashboard-card img {
+        transition: transform 0.25s ease;
+    }
+
+    .dashboard-card:hover img {
+        transform: scale(1.05);
+    }
+</style>
+
+<div class="container py-4">
+
+    <!-- HEADER -->
+    <div class="text-center mb-4">
+        <h1 class="fw-bold">Football Club Dashboard</h1>
+        <p class="text-muted">Coach overview and team statistics</p>
+    </div>
+
+    <!-- STATS -->
+    <div class="row g-4 mb-5">
+
+        <div class="col-md-3">
+            <div class="card text-white bg-primary shadow">
+                <div class="card-body text-center">
+                    <h5>Players</h5>
+                    <h2 class="fw-bold">@ViewBag.TotalPlayers</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card text-white bg-dark shadow">
+                <div class="card-body text-center">
+                    <h5>Teams</h5>
+                    <h2 class="fw-bold">@ViewBag.TotalTeams</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card text-white bg-success shadow">
+                <div class="card-body text-center">
+                    <h5>Matches</h5>
+                    <h2 class="fw-bold">@ViewBag.TotalMatches</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card text-white bg-warning shadow">
+                <div class="card-body text-center">
+                    <h5>Goals</h5>
+                    <h2 class="fw-bold">@ViewBag.TotalGoals</h2>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- NAVIGATION CARDS -->
+    <div class="row g-4">
+
+        <!-- Teams -->
+        <div class="col-md-3">
+            <a asp-controller="Teams"
+               asp-action="Index"
+               class="dashboard-card">
+
+                <div class="card shadow">
+
+                    <img src="/images/teams.jpg"
+                         class="card-img-top"
+                         alt="Teams image" />
+
+                    <div class="card-body text-center">
+                        <h3>Teams</h3>
+                        <p>View and manage football teams.</p>
+                    </div>
+
+                </div>
+
+            </a>
+        </div>
+
+        <!-- Players -->
+        <div class="col-md-3">
+            <a asp-controller="Player"
+               asp-action="Index"
+               class="dashboard-card">
+
+                <div class="card shadow">
+
+                    <img src="/images/players.jpg"
+                         class="card-img-top"
+                         alt="Players image" />
+
+                    <div class="card-body text-center">
+                        <h3>Players</h3>
+                        <p>Browse and manage players.</p>
+                    </div>
+
+                </div>
+
+            </a>
+        </div>
+
+        <!-- Matches -->
+        <div class="col-md-3">
+            <a asp-controller="Match"
+               asp-action="Index"
+               class="dashboard-card">
+
+                <div class="card shadow">
+
+                    <img src="/images/matches.jpg"
+                         class="card-img-top"
+                         alt="Matches image" />
+
+                    <div class="card-body text-center">
+                        <h3>Matches</h3>
+                        <p>View match schedule and results.</p>
+                    </div>
+
+                </div>
+
+            </a>
+        </div>
+
+        <!-- Market -->
+        <div class="col-md-3">
+            <a asp-controller="Market"
+               asp-action="Index"
+               class="dashboard-card">
+
+                <div class="card shadow">
+
+                    <img src="/images/market.jpg"
+                         class="card-img-top"
+                         alt="Market image" />
+
+                    <div class="card-body text-center">
+                        <h3>Market</h3>
+                        <p>Buy and sell players.</p>
+                    </div>
+
+                </div>
+
+            </a>
+        </div>
+
+    </div>
+
+</div>

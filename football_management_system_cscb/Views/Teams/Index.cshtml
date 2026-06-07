@@ -1,0 +1,36 @@
+@model IEnumerable<football_management_system_cscb.Models.Team>
+
+<div class="container mt-5">
+
+    <div class="table-responsive scroll-table">
+
+        <table class="table table-striped table-hover table-bordered shadow mb-0">
+
+            <thead class="table-dark sticky-top">
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>City</th>
+                    <th>Foundation Year</th>
+                    <th>Stadium</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var team in Model)
+                {
+                    <tr>
+                        <td>@team.TeamId</td>
+                        <td>@team.Name</td>
+                        <td>@team.City</td>
+                        <td>@team.FoundationYear</td>
+                        <td>@team.Stadium</td>
+                    </tr>
+                }
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>

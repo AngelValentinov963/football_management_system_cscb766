@@ -1,0 +1,36 @@
+﻿@model football_management_system_cscb.ViewModels.LoginViewModel
+
+<div class="container d-flex justify-content-center align-items-center" style="height: 80vh;">
+
+    <div class="card shadow p-4" style="width: 350px; border-radius: 12px;">
+
+        <h3 class="text-center mb-4">Login</h3>
+
+        <form asp-action="Login" method="post">
+
+            <div class="mb-3">
+                <label class="form-label">Username</label>
+                <input asp-for="Username" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Password</label>
+                <input asp-for="Password" type="password" class="form-control" />
+            </div>
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger">
+                    @ViewBag.Error
+                </div>
+            }
+
+            <button type="submit" class="btn btn-primary w-100">
+                Login
+            </button>
+
+        </form>
+
+    </div>
+
+</div>

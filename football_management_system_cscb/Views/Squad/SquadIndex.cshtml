@@ -1,0 +1,95 @@
+﻿@model IEnumerable<football_management_system_cscb.ViewModels.PlayerViewModel>
+
+<div class="page-wrapper">
+
+    <div class="player-table card shadow-sm">
+
+        <div class="table-responsive scroll-table">
+
+            <table class="table table-hover align-middle mb-0">
+
+                <thead>
+                    <tr>
+                        <th>Player</th>
+                        <th>Age</th>
+                        <th>Nationality</th>
+                        <th>Position</th>
+                        <th>OVR</th>
+                        <th>POT</th>
+                        <th>Value</th>
+                        <th></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var player in Model)
+                    {
+                        var age = DateTime.Today.Year - player.BirthDate.Year;
+
+                        <tr>
+
+                            <td>
+                                <strong>@player.FullName</strong>
+                                <div class="text-muted small">ID: @player.PlayerId</div>
+                            </td>
+
+                            <td>@age</td>
+
+                            <td>@player.Nationality</td>
+
+                            <td>
+                                <span class="position-badge">
+                                    @player.PreferredPosition
+                                </span>
+                            </td>
+
+                            <td>
+                                <span class="rating @(player.OverallRating >= 80 ? "good" : "normal")">
+                                    @player.OverallRating
+                                </span>
+                            </td>
+
+                            <td>
+                                <span class="rating @(player.Potential >= 80 ? "good" : "normal")">
+                                    @player.Potential
+                                </span>
+                            </td>
+
+                            <td>
+                                €@string.Format("{0:N0}", player.MarketValue ?? 0)
+                            </td>
+
+                            <td class="text-end">
+
+                                @if (player.IsInSquad)
+                                {
+                                    <form asp-action="RemoveFromSquad" method="post">
+                                        <input type="hidden" name="playerId" value="@player.PlayerId" />
+                                        <button class="btn btn-danger btn-sm">
+                                            Remove
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <form asp-action="AddToSquad" method="post">
+                                        <input type="hidden" name="playerId" value="@player.PlayerId" />
+                                        <button class="btn btn-success btn-sm">
+                                            Add
+                                        </button>
+                                    </form>
+                                }
+
+                            </td>
+
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
