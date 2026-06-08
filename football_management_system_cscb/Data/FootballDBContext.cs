@@ -1,4 +1,5 @@
 ﻿using football_management_system_cscb.Models;
+using football_management_system_cscb.Models.Season;
 using Microsoft.EntityFrameworkCore;
 
 namespace football_management_system_cscb.Data
@@ -12,8 +13,12 @@ namespace football_management_system_cscb.Data
 
         public DbSet<User> Users { get; set; }
 
-
         // Tables
+        public DbSet<Season> Seasons { get; set; }
+        //public DbSet<SeasonWeek> SeasonWeeks { get; set; }
+
+        public DbSet<Fixture> Fixtures { get; set; }
+        public DbSet<LeagueTableEntry> LeagueTableEntries { get; set; }
         public DbSet<Team> Teams { get; set; }
         public DbSet<Player> Players { get; set; }
         public DbSet<FootballMatch> FootballMatches { get; set; }
@@ -40,23 +45,22 @@ namespace football_management_system_cscb.Data
                 .HasKey(m => m.MatchId);
 
             // OPTIONAL RELATIONSHIPS (safe basic setup)
-
-            modelBuilder.Entity<Player>()
-                .HasOne<Team>()
-                .WithMany()
-                .HasForeignKey(p => p.TeamId);
-
             modelBuilder.Entity<FootballMatch>()
                 .HasOne<Team>()
-                .WithMany()
+                .WithMany(t => t.HomeMatches)
                 .HasForeignKey(m => m.HomeTeamId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<FootballMatch>()
                 .HasOne<Team>()
-                .WithMany()
+                .WithMany(t => t.AwayMatches)
                 .HasForeignKey(m => m.AwayTeamId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Player>()
+                .HasOne<Team>()
+                .WithMany(t => t.Players)
+                .HasForeignKey(p => p.TeamId);
         }
     }
 }

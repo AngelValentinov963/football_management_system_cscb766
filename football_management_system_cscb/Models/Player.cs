@@ -39,13 +39,28 @@ namespace football_management_system_cscb.Models
         [Column("wage")]
         public decimal? Wage { get; set; }
 
-        [Column("release_clause")]
-        public decimal? ReleaseClause { get; set; }
+        [Column("attack")]
+        public int Attack { get; set; }
 
-        [Column("body_type")]
-        public string? BodyType { get; set; }
+        [Column("defense")]
+        public int Defense { get; set; }
 
-        [Column("real_face")]
-        public bool? RealFace { get; set; }
+        [Column("passing")]
+        public int Passing { get; set; }
+
+        [Column("pace")]
+        public int Pace { get; set; }
+
+        [Column("shooting")]
+        public int Shooting { get; set; }
+
+        [Column("dribbling")]
+        public int Dribbling { get; set; }
+
+        [Column("stamina")]
+        public int Stamina { get; set; }
+
+        [Column("goalkeeping")]
+        public int Goalkeeping { get; set; }
     }
 }

@@ -464,3 +464,34 @@ hr { border-color: var(--border); }
     #sidebar .nav-label, #sidebar .brand-text { display: none; }
     #page-content { padding: 20px; }
 }
+
+
+
+/*ScoreBoard in the MatchIndex*/
+.scoreboard {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #111;
+    color: white;
+    padding: 15px 30px;
+    border-radius: 10px;
+    font-size: 20px;
+}
+
+.team {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+    .team img {
+        width: 40px;
+        height: 40px;
+        object-fit: contain;
+    }
+
+.score {
+    font-size: 30px;
+    font-weight: bold;
+}

@@ -1,0 +1,71 @@
+﻿@model List<football_management_system_cscb.ViewModel.WeeklyFixturesViewModel>
+
+<h2>📅 Season Fixtures</h2>
+
+<div id="seasonCarousel" class="carousel slide" data-bs-ride="false">
+
+    <div class="carousel-inner">
+
+        @{
+            var first = true;
+        }
+
+        @foreach (var week in Model)
+        {
+            <div class="carousel-item @(first ? "active" : "")">
+                <div class="week-container p-3">
+
+                    <h3 class="text-white mb-3">
+                        Week @week.WeekNumber
+                    </h3>
+
+                    <table class="table table-dark table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Home</th>
+                                <th style="text-align:center;">Score</th>
+                                <th>Away</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var f in week.Fixtures)
+                            {
+                                <tr>
+                                    <td class="text-center">@f.HomeTeamName</td>
+
+                                    <td class="text-center">
+                                        @if (f.HomeGoals.HasValue && f.AwayGoals.HasValue)
+                                        {
+                                            <strong>@f.HomeGoals - @f.AwayGoals</strong>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">vs</span>
+                                        }
+                                    </td>
+
+                                    <td class="text-center">@f.AwayTeamName</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+
+            first = false;
+        }
+
+    </div>
+
+    <!-- Controls -->
+    <button class="carousel-control-prev" type="button" data-bs-target="#seasonCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon"></span>
+    </button>
+
+    <button class="carousel-control-next" type="button" data-bs-target="#seasonCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon"></span>
+    </button>
+
+</div>

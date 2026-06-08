@@ -1,0 +1,163 @@
+﻿@{
+    var home = ViewBag.HomeTeam;
+    var away = ViewBag.AwayTeam;
+}
+
+<style>
+    .scoreboard {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 40px;
+        background: #111;
+        color: white;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+
+    .team {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 220px;
+    }
+
+    .logo {
+        width: 50px;
+        height: 50px;
+        object-fit: contain;
+    }
+
+    .score {
+        font-size: 36px;
+        font-weight: bold;
+    }
+
+    #minute {
+        text-align: center;
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    #events {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+</style>
+
+<div class="scoreboard">
+
+    <div class="team">
+        @if (home != null)
+        {
+            <img src="@home.LogoUrl" class="logo" />
+            <span>@home.Name</span>
+        }
+    </div>
+
+    <div class="score">
+        <span id="home">0</span>
+        -
+        <span id="away">0</span>
+    </div>
+
+    <div class="team">
+        @if (away != null)
+        {
+            <img src="@away.LogoUrl" class="logo" />
+            <span>@away.Name</span>
+        }
+    </div>
+
+</div>
+
+<p id="minute">0'</p>
+
+<button id="startBtn" onclick="startMatch()">Start Match</button>
+
+<hr />
+
+<h3>Events</h3>
+
+<ul id="events"></ul>
+
+<script>
+
+    let interval = null;
+
+    function startMatch() {
+
+        window.location.href =
+            '/Match/Start?homeId=2&awayId=3';
+    }
+
+    function tick() {
+
+        fetch('/Match/Tick', {
+            method: 'POST'
+        })
+        .then(r => {
+
+            if (!r.ok)
+                throw new Error("Match not started");
+
+            return r.json();
+        })
+        .then(data => {
+
+            document.getElementById("home").innerText =
+                data.homeGoals;
+
+            document.getElementById("away").innerText =
+                data.awayGoals;
+
+            document.getElementById("minute").innerText =
+                data.currentMinute + "'";
+
+            const list =
+                document.getElementById("events");
+
+            list.innerHTML = "";
+
+            data.events.forEach(e => {
+
+                const li =
+                    document.createElement("li");
+
+                li.innerText =
+                    e.minute + "' - " + e.description;
+
+                list.appendChild(li);
+            });
+
+            if (data.isFinished) {
+
+                clearInterval(interval);
+
+                const btn =
+                    document.getElementById("startBtn");
+
+                btn.disabled = true;
+                btn.innerText = "Match Finished";
+            }
+        })
+        .catch(err => console.log(err));
+    }
+
+    window.onload = () => {
+
+        fetch('/Match/State')
+            .then(r => r.json())
+            .then(state => {
+
+                if (state && !state.isFinished) {
+
+                    interval =
+                        setInterval(tick, 1000);
+                }
+            })
+            .catch(() => {});
+    };
+
+</script>

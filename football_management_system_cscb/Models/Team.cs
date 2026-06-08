@@ -18,6 +18,12 @@ namespace football_management_system_cscb.Models
         [Column("stadium")]
         public string Stadium { get; set; }
 
+        [Column("team_logo")]
+        public string LogoUrl { get; set; }
+
+        public List<Player> Players { get; set; } = new();
+        public List<FootballMatch> HomeMatches { get; set; } = new();
+        public List<FootballMatch> AwayMatches { get; set; } = new();
 
     }
 }
