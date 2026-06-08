@@ -1,94 +1,767 @@
+@using football_management_system_cscb.ViewModel
+@model List<TeamFormViewModel>
+
 @{
     ViewData["Title"] = "Dashboard";
+    var table = ViewBag.LeagueTable as List<LeagueTableRowViewModel>;
 }
 
-<div class="page-header">
-    <div>
-        <h1>Club Dashboard</h1>
-        <p class="subtitle">Overview of your squad, fixtures and finances.</p>
-    </div>
+@section Styles {
+    <style>
+
+        /* Table for the laderboard*/
+        .league-table {
+            width: 100%;
+            border-collapse: collapse;
+            color: #e8eef8;
+            font-size: 13px;
+        }
+
+            .league-table thead th {
+                text-align: left;
+                font-size: 11px;
+                letter-spacing: .08em;
+                text-transform: uppercase;
+                color: #7d92ad;
+                padding: 10px 6px;
+                border-bottom: 1px solid rgba(255,255,255,.08);
+            }
+
+            .league-table tbody td {
+                padding: 10px 6px;
+                border-bottom: 1px solid rgba(255,255,255,.05);
+            }
+
+            .league-table tbody tr:hover {
+                background: rgba(255,255,255,.03);
+            }
+
+        .team-cell {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        /* ===== FM Dashboard (sidebar-safe, shrink-to-fit) ===== */
+
+        /* 🔧 Root container — never exceeds the main content area */
+        .fm-dash {
+            display: grid;
+            gap: 18px;
+            width: 100%;
+            max-width: 100%;
+            min-width: 0; /* allow grid children to shrink */
+            box-sizing: border-box;
+            overflow: hidden; /* kill any horizontal bleed */
+        }
+
+            .fm-dash *,
+            .fm-dash *::before,
+            .fm-dash *::after {
+                box-sizing: border-box;
+                min-width: 0;
+            }
+
+        /* Hero */
+        .fm-hero {
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+            padding: clamp(18px,2.4vw,30px) clamp(20px,2.6vw,34px);
+            background: radial-gradient(900px 320px at 110% -40%, rgba(0,217,126,.25), transparent 60%), radial-gradient(600px 260px at -10% 120%, rgba(56,189,248,.20), transparent 60%), linear-gradient(135deg,#0b1220 0%,#0e1a2b 60%,#0b1220 100%);
+            border: 1px solid rgba(255,255,255,.08);
+            box-shadow: 0 24px 60px -40px rgba(0,0,0,.7);
+        }
+
+            .fm-hero::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background-image: linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px), linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);
+                background-size: 34px 34px;
+                mask-image: radial-gradient(ellipse at 70% 30%,#000 30%,transparent 75%);
+                pointer-events: none;
+            }
+
+        .fm-hero-inner {
+            position: relative;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .fm-hero-left {
+            flex: 1 1 320px;
+            min-width: 0;
+        }
+
+        .fm-hero h1 {
+            font-family: 'Outfit',system-ui,sans-serif;
+            font-size: clamp(22px,2.4vw,34px);
+            margin: 0 0 6px;
+            letter-spacing: -.02em;
+            color: #fff;
+        }
+
+        .fm-hero p {
+            margin: 0;
+            color: #9fb0c5;
+            max-width: 520px;
+            line-height: 1.5;
+            font-size: 13.5px;
+        }
+
+        .fm-hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 11px;
+            border-radius: 999px;
+            background: rgba(0,217,126,.12);
+            color: #7ef0b6;
+            border: 1px solid rgba(0,217,126,.35);
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+            .fm-hero-badge .dot {
+                width: 7px;
+                height: 7px;
+                border-radius: 50%;
+                background: #00d97e;
+                box-shadow: 0 0 10px #00d97e;
+                animation: pulse 1.8s ease-in-out infinite;
+            }
+
+        @@keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: .55;
+                transform: scale(1.35);
+            }
+        }
+
+        .fm-hero-clock {
+            text-align: right;
+            color: #cfe0f5;
+            font-family: 'Outfit',system-ui;
+        }
+
+            .fm-hero-clock .time {
+                font-size: clamp(20px,2vw,28px);
+                font-weight: 700;
+                letter-spacing: .04em;
+            }
+
+            .fm-hero-clock .date {
+                font-size: 12px;
+                color: #8aa0bc;
+                letter-spacing: .08em;
+                text-transform: uppercase;
+            }
+
+        .fm-cta {
+            display: flex;
+            gap: 8px;
+            margin-top: 14px;
+            flex-wrap: wrap;
+        }
+
+        .fm-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 13px;
+            text-decoration: none;
+            transition: transform .15s ease, box-shadow .2s ease;
+            border: 1px solid transparent;
+        }
+
+        .fm-btn-primary {
+            background: linear-gradient(135deg,#00d97e,#00a35f);
+            color: #08231a;
+            box-shadow: 0 10px 24px -10px rgba(0,217,126,.5);
+        }
+
+            .fm-btn-primary:hover {
+                transform: translateY(-2px);
+                color: #08231a;
+            }
+
+        .fm-btn-ghost {
+            background: rgba(255,255,255,.05);
+            color: #dbe6f5;
+            border-color: rgba(255,255,255,.1);
+        }
+
+            .fm-btn-ghost:hover {
+                background: rgba(255,255,255,.1);
+                color: #fff;
+            }
+
+        /* KPI grid — auto-fit so it never overflows */
+        .fm-kpis {
+            display: grid;
+            gap: 14px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        }
+
+        .fm-kpi {
+            position: relative;
+            overflow: hidden;
+            padding: 16px 18px;
+            border-radius: 16px;
+            background: linear-gradient(160deg,rgba(255,255,255,.04),rgba(255,255,255,.015));
+            border: 1px solid rgba(255,255,255,.08);
+            transition: transform .2s ease, border-color .2s ease;
+        }
+
+            .fm-kpi:hover {
+                transform: translateY(-3px);
+                border-color: rgba(0,217,126,.35);
+            }
+
+            .fm-kpi .label {
+                color: #8aa0bc;
+                font-size: 11px;
+                letter-spacing: .12em;
+                text-transform: uppercase;
+                font-weight: 600;
+            }
+
+            .fm-kpi .value {
+                font-family: 'Outfit',sans-serif;
+                font-size: clamp(24px,2.4vw,32px);
+                font-weight: 700;
+                color: #fff;
+                line-height: 1;
+                margin-top: 8px;
+            }
+
+            .fm-kpi .icon {
+                position: absolute;
+                right: 12px;
+                top: 12px;
+                width: 38px;
+                height: 38px;
+                border-radius: 10px;
+                display: grid;
+                place-items: center;
+                font-size: 18px;
+                background: rgba(0,217,126,.12);
+                color: #00d97e;
+                border: 1px solid rgba(0,217,126,.3);
+            }
+
+            .fm-kpi.t-blue .icon {
+                background: rgba(56,189,248,.12);
+                color: #38bdf8;
+                border-color: rgba(56,189,248,.3);
+            }
+
+            .fm-kpi.t-amber .icon {
+                background: rgba(251,191,36,.12);
+                color: #fbbf24;
+                border-color: rgba(251,191,36,.3);
+            }
+
+            .fm-kpi.t-rose .icon {
+                background: rgba(244,114,182,.12);
+                color: #f472b6;
+                border-color: rgba(244,114,182,.3);
+            }
+
+        /* Section heading */
+        .fm-section-head {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            margin: 4px 2px 2px;
+        }
+
+            .fm-section-head h2 {
+                font-family: 'Outfit',sans-serif;
+                font-size: 18px;
+                color: #fff;
+                margin: 0;
+                letter-spacing: -.01em;
+            }
+
+            .fm-section-head .hint {
+                color: #7d92ad;
+                font-size: 11px;
+                letter-spacing: .08em;
+                text-transform: uppercase;
+            }
+
+        /* Carousel — width capped to its grid cell */
+        .fm-carousel-wrap {
+            position: relative;
+            width: 100%;
+            min-width: 0;
+        }
+
+        .fm-carousel {
+            display: grid;
+            grid-auto-flow: column;
+            grid-auto-columns: minmax(220px, 260px);
+            gap: 14px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scroll-snap-type: x mandatory;
+            padding: 4px 2px 14px;
+            scrollbar-width: none;
+            width: 100%;
+        }
+
+            .fm-carousel::-webkit-scrollbar {
+                display: none;
+            }
+
+        .fm-card {
+            scroll-snap-align: start;
+            position: relative;
+            overflow: hidden;
+            border-radius: 16px;
+            padding: 18px;
+            min-height: 150px;
+            background: linear-gradient(160deg,rgba(255,255,255,.05),rgba(255,255,255,.02));
+            border: 1px solid rgba(255,255,255,.08);
+            color: #e8eef8;
+            text-decoration: none;
+            transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+            .fm-card:hover {
+                transform: translateY(-4px);
+                border-color: rgba(0,217,126,.4);
+                box-shadow: 0 20px 40px -25px rgba(0,217,126,.35);
+                color: #fff;
+            }
+
+            .fm-card .ico {
+                width: 40px;
+                height: 40px;
+                border-radius: 11px;
+                display: grid;
+                place-items: center;
+                font-size: 20px;
+                background: rgba(0,217,126,.14);
+                color: #00d97e;
+                border: 1px solid rgba(0,217,126,.3);
+                margin-bottom: 10px;
+            }
+
+            .fm-card h3 {
+                margin: 0 0 4px;
+                font-size: 16px;
+                font-family: 'Outfit',sans-serif;
+            }
+
+            .fm-card p {
+                margin: 0;
+                color: #94a8c2;
+                font-size: 12.5px;
+                line-height: 1.45;
+            }
+
+            .fm-card .go {
+                margin-top: 10px;
+                font-size: 11px;
+                font-weight: 600;
+                letter-spacing: .1em;
+                text-transform: uppercase;
+                color: #7ef0b6;
+            }
+
+            .fm-card.v-blue .ico {
+                background: rgba(56,189,248,.14);
+                color: #38bdf8;
+                border-color: rgba(56,189,248,.3);
+            }
+
+            .fm-card.v-amber .ico {
+                background: rgba(251,191,36,.14);
+                color: #fbbf24;
+                border-color: rgba(251,191,36,.3);
+            }
+
+            .fm-card.v-rose .ico {
+                background: rgba(244,114,182,.14);
+                color: #f472b6;
+                border-color: rgba(244,114,182,.3);
+            }
+
+            .fm-card.v-violet .ico {
+                background: rgba(167,139,250,.14);
+                color: #a78bfa;
+                border-color: rgba(167,139,250,.3);
+            }
+
+        .fm-carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            background: rgba(15,23,36,.9);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,.12);
+            cursor: pointer;
+            z-index: 3;
+            transition: background .15s ease;
+        }
+
+            .fm-carousel-btn:hover {
+                background: #00d97e;
+                color: #08231a;
+                border-color: #00d97e;
+            }
+
+            .fm-carousel-btn.prev {
+                left: -4px;
+            }
+
+            .fm-carousel-btn.next {
+                right: -4px;
+            }
+
+        /* Lower 2-col panels */
+        .fm-grid-2 {
+            display: grid;
+            gap: 16px;
+            grid-template-columns: minmax(0,1.4fr) minmax(0,1fr);
+            align-items: start;
+            width: 100%;
+        }
+
+        @@media (max-width:1100px) {
+            .fm-grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .fm-panel {
+            border-radius: 16px;
+            padding: 18px;
+            background: linear-gradient(160deg,rgba(255,255,255,.04),rgba(255,255,255,.015));
+            border: 1px solid rgba(255,255,255,.08);
+            min-width: 0;
+        }
+
+            .fm-panel h3 {
+                margin: 0 0 10px;
+                font-family: 'Outfit',sans-serif;
+                color: #fff;
+                font-size: 16px;
+            }
+
+            .fm-panel.compact {
+                max-height: 340px;
+                display: flex;
+                flex-direction: column;
+            }
+
+                .fm-panel.compact .body {
+                    overflow: auto;
+                    padding-right: 4px;
+                }
+
+        /* Form rows */
+        .fm-form-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 7px 0;
+            border-bottom: 1px dashed rgba(255,255,255,.06);
+        }
+
+            .fm-form-row:last-child {
+                border-bottom: 0;
+            }
+
+            .fm-form-row .team {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                color: #e8eef8;
+                font-weight: 500;
+                font-size: 13.5px;
+                min-width: 0;
+            }
+
+            .fm-form-row .avatar {
+                width: 26px;
+                height: 26px;
+                border-radius: 7px;
+                background: linear-gradient(135deg,#1b2a40,#0e1a2b);
+                display: grid;
+                place-items: center;
+                color: #7ef0b6;
+                font-weight: 700;
+                font-size: 12px;
+                border: 1px solid rgba(255,255,255,.08);
+            }
+
+        .fm-form {
+            display: flex;
+            gap: 4px;
+        }
+
+            .fm-form span {
+                width: 20px;
+                height: 20px;
+                border-radius: 5px;
+                display: grid;
+                place-items: center;
+                font-size: 10px;
+                font-weight: 700;
+                color: #fff;
+            }
+
+            .fm-form .w {
+                background: #16a34a;
+            }
+
+            .fm-form .d {
+                background: #64748b;
+            }
+
+            .fm-form .l {
+                background: #dc2626;
+            }
+
+        /* News */
+        .fm-news {
+            margin: 0;
+            padding: 0;
+        }
+
+            .fm-news li {
+                list-style: none;
+                padding: 8px 0;
+                border-bottom: 1px dashed rgba(255,255,255,.06);
+                display: flex;
+                gap: 10px;
+                align-items: flex-start;
+                color: #cfdcec;
+                font-size: 13px;
+            }
+
+                .fm-news li:last-child {
+                    border: 0;
+                }
+
+            .fm-news .tag {
+                flex: 0 0 auto;
+                padding: 3px 7px;
+                border-radius: 6px;
+                font-size: 10px;
+                font-weight: 700;
+                letter-spacing: .08em;
+                text-transform: uppercase;
+                background: rgba(0,217,126,.12);
+                color: #7ef0b6;
+                border: 1px solid rgba(0,217,126,.25);
+            }
+
+                .fm-news .tag.alt {
+                    background: rgba(56,189,248,.12);
+                    color: #7dd3fc;
+                    border-color: rgba(56,189,248,.25);
+                }
+
+                .fm-news .tag.warn {
+                    background: rgba(251,191,36,.12);
+                    color: #fcd34d;
+                    border-color: rgba(251,191,36,.25);
+                }
+
+                .fm-news .tag.board {
+                    background: rgba(167,139,250,.12);
+                    color: #c4b5fd;
+                    border-color: rgba(167,139,250,.25);
+                }
+
+            .fm-news time {
+                display: block;
+                color: #7d92ad;
+                font-size: 11px;
+                margin-top: 2px;
+                letter-spacing: .04em;
+            }
+    </style>
+}
+<div class="fm-dash">
+    <!-- Lower panels -->
+    <section class="fm-grid-2">
+        <div class="fm-panel compact">
+            <h3>League Table</h3>
+
+            <div class="body">
+                <table class="league-table">
+                    <thead>
+                        <tr>
+                            <th>Team</th>
+                            <th>P</th>
+                            <th>W</th>
+                            <th>D</th>
+                            <th>L</th>
+                            <th>GF</th>
+                            <th>GA</th>
+                            <th>GD</th>
+                            <th>Pts</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @if (table != null)
+                        {
+                            foreach (var t in table)
+                            {
+                                <tr>
+                                    <td class="team-cell">
+                                        <img src="@t.LogoUrl" style="width:18px;height:18px;border-radius:4px;margin-right:6px;" />
+                                        @t.TeamName
+                                    </td>
+
+                                    <td>@t.Played</td>
+                                    <td>@t.Wins</td>
+                                    <td>@t.Draws</td>
+                                    <td>@t.Losses</td>
+                                    <td>@t.GoalsFor</td>
+                                    <td>@t.GoalsAgainst</td>
+                                    <td>@t.GoalDifference</td>
+                                    <td><strong>@t.Points</strong></td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="fm-panel compact">
+            <h3>News Feed</h3>
+
+            <div class="body">
+                <ul class="fm-news">
+                    <li><span class="tag">Match</span><div>Top of the table clash this weekend — dial in your tactics.<time>Today</time></div></li>
+                    <li><span class="tag alt">Transfer</span><div>Scouts spotted a rising star on the market. Bid before rivals.<time>Yesterday</time></div></li>
+                    <li><span class="tag warn">Injury</span><div>Rotate your squad — fatigue is climbing after three fixtures.<time>2 days ago</time></div></li>
+                    <li><span class="tag board">Board</span><div>The board expects a Top-4 finish. Keep them happy.<time>This week</time></div></li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- KPIs -->
+    <section class="fm-kpis">
+        <div class="fm-kpi">
+            <div class="icon">👥</div>
+            <div class="label">Players</div>
+            <div class="value">@ViewBag.TotalPlayers</div>
+        </div>
+        <div class="fm-kpi t-blue">
+            <div class="icon">🛡️</div>
+            <div class="label">Teams</div>
+            <div class="value">@ViewBag.TotalTeams</div>
+        </div>
+        <div class="fm-kpi t-amber">
+            <div class="icon">📊</div>
+            <div class="label">Matches</div>
+            <div class="value">@ViewBag.TotalMatches</div>
+        </div>
+        <div class="fm-kpi t-rose">
+            <div class="icon">🥅</div>
+            <div class="label">Goals</div>
+            <div class="value">@ViewBag.TotalGoals</div>
+        </div>
+    </section>
+
+    <!-- Manager Hub Carousel -->
+    <section>
+        <div class="fm-section-head">
+            <h2>Manager Hub</h2>
+            <span class="hint">Swipe / scroll →</span>
+        </div>
+        <div class="fm-carousel-wrap">
+            <button class="fm-carousel-btn prev" onclick="fmScroll(-1)" aria-label="Prev">‹</button>
+            <button class="fm-carousel-btn next" onclick="fmScroll(1)" aria-label="Next">›</button>
+            <div class="fm-carousel" id="fmCarousel">
+                <a class="fm-card" href="/Teams">
+                    <div><div class="ico">🛡️</div><h3>Teams</h3><p>Manage clubs, ratings and league standings.</p></div>
+                    <span class="go">Enter →</span>
+                </a>
+                <a class="fm-card v-blue" href="/Players">
+                    <div><div class="ico">👤</div><h3>Players</h3><p>Browse the global player pool and scout talent.</p></div>
+                    <span class="go">Enter →</span>
+                </a>
+                <a class="fm-card v-amber" href="/Squad">
+                    <div><div class="ico">⚽</div><h3>Squad &amp; Tactics</h3><p>Pick your starting eleven and set formation.</p></div>
+                    <span class="go">Enter →</span>
+                </a>
+                <a class="fm-card v-rose" href="/Market">
+                    <div><div class="ico">💰</div><h3>Transfer Market</h3><p>Buy and sell players to reshape your roster.</p></div>
+                    <span class="go">Enter →</span>
+                </a>
+                <a class="fm-card v-violet" href="/Season/Fixtures">
+                    <div><div class="ico">📅</div><h3>Fixtures</h3><p>See every match-week and the next kick-off.</p></div>
+                    <span class="go">Enter →</span>
+                </a>
+                
+            </div>
+        </div>
+    </section>
+
+    
+
 </div>
 
-<!-- STATS -->
-<div class="row g-3 mb-4">
-    <div class="col-6 col-md-3">
-        <div class="card bg-primary">
-            <div class="card-body">
-                <h5>Players</h5>
-                <h2>@ViewBag.TotalPlayers</h2>
-            </div>
-        </div>
-    </div>
-    <div class="col-6 col-md-3">
-        <div class="card bg-dark">
-            <div class="card-body">
-                <h5>Teams</h5>
-                <h2>@ViewBag.TotalTeams</h2>
-            </div>
-        </div>
-    </div>
-    <div class="col-6 col-md-3">
-        <div class="card bg-success">
-            <div class="card-body">
-                <h5>Matches</h5>
-                <h2>@ViewBag.TotalMatches</h2>
-            </div>
-        </div>
-    </div>
-    <div class="col-6 col-md-3">
-        <div class="card bg-warning">
-            <div class="card-body">
-                <h5>Goals</h5>
-                <h2>@ViewBag.TotalGoals</h2>
-            </div>
-        </div>
-    </div>
-</div>
+@section Scripts {
+    <script>
+        (function(){
+            const t = document.getElementById('fmClock');
+            const d = document.getElementById('fmDate');
+            function tick(){
+                const n = new Date();
+                t.textContent = n.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+                d.textContent = n.toLocaleDateString([], {weekday:'short', day:'2-digit', month:'short', year:'numeric'});
+            }
+            tick(); setInterval(tick, 30000);
+        })();
 
-<!-- NAVIGATION CARDS -->
-<div class="row g-3">
-    <div class="col-6 col-md-3">
-        <a asp-controller="Teams" asp-action="Index" class="dashboard-card">
-            <div class="card">
-                <img src="/images/teams.jpg" class="card-img-top" alt="Teams" />
-                <div class="card-body text-center">
-                    <h3>Teams</h3>
-                    <p>Manage clubs in the league.</p>
-                </div>
-            </div>
-        </a>
-    </div>
-    <div class="col-6 col-md-3">
-        <a asp-controller="Player" asp-action="Index" class="dashboard-card">
-            <div class="card">
-                <img src="/images/players.jpg" class="card-img-top" alt="Players" />
-                <div class="card-body text-center">
-                    <h3>Players</h3>
-                    <p>Browse the full player pool.</p>
-                </div>
-            </div>
-        </a>
-    </div>
-    <div class="col-6 col-md-3">
-        <a asp-controller="Squad" asp-action="Index" class="dashboard-card">
-            <div class="card">
-                <img src="/images/matches.jpg" class="card-img-top" alt="Squad" />
-                <div class="card-body text-center">
-                    <h3>Squad</h3>
-                    <p>Pick your starting eleven.</p>
-                </div>
-            </div>
-        </a>
-    </div>
-    <div class="col-6 col-md-3">
-        <a asp-controller="Market" asp-action="Index" class="dashboard-card">
-            <div class="card">
-                <img src="/images/market.jpg" class="card-img-top" alt="Market" />
-                <div class="card-body text-center">
-                    <h3>Market</h3>
-                    <p>Buy and sell players.</p>
-                </div>
-            </div>
-        </a>
-    </div>
-</div>
+        function fmScroll(dir){
+            const el = document.getElementById('fmCarousel');
+            if(!el) return;
+            const step = el.clientWidth * 0.7;
+            el.scrollBy({ left: dir * step, behavior:'smooth' });
+        }
+
+        (function(){
+            const el = document.getElementById('fmCarousel');
+            if(!el) return;
+            let down=false, sx=0, sl=0;
+            el.addEventListener('mousedown', e=>{ down=true; sx=e.pageX; sl=el.scrollLeft; el.style.cursor='grabbing'; });
+            window.addEventListener('mouseup', ()=>{ down=false; el.style.cursor=''; });
+            el.addEventListener('mouseleave', ()=>{ down=false; el.style.cursor=''; });
+            el.addEventListener('mousemove', e=>{ if(!down) return; el.scrollLeft = sl - (e.pageX - sx); });
+        })();
+    </script>
+}

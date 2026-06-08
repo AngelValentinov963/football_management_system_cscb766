@@ -25,5 +25,9 @@ namespace football_management_system_cscb.Models
         public List<FootballMatch> HomeMatches { get; set; } = new();
         public List<FootballMatch> AwayMatches { get; set; } = new();
 
+        [Column("default_formation")]
+        public string DefaultFormation { get; set; }
+
+
     }
 }

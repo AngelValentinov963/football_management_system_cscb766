@@ -1,0 +1,413 @@
+@model football_management_system_cscb.ViewModel.SquadViewModel
+
+@{
+    ViewData["Title"] = "Tactics";
+}
+
+<style>
+    .tac-page-header {
+        margin-bottom: 24px;
+    }
+
+        .tac-page-header h1 {
+            font-size: 26px;
+            font-weight: 600;
+            color: var(--text-primary, #111);
+            margin: 0 0 4px;
+        }
+
+        .tac-page-header p {
+            font-size: 14px;
+            color: var(--text-muted, #888);
+            margin: 0;
+        }
+
+    /* 🔥 MAIN FIX: layout balance */
+    .tac-layout {
+        display: flex;
+        gap: 20px;
+        height: 640px;
+        align-items: stretch;
+    }
+
+    /* ── Pitch panel (takes remaining space) ── */
+    .pitch-panel {
+        flex: 1 1 auto;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 16px;
+    }
+
+    .formation-bar {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    .fmt-btn {
+        font-size: 12px;
+        font-weight: 500;
+        padding: 5px 14px;
+        border: 1.5px solid #d1d5db;
+        border-radius: 20px;
+        background: transparent;
+        color: #555;
+        cursor: pointer;
+        transition: all .15s;
+    }
+
+        .fmt-btn:hover {
+            border-color: #1D9E75;
+            color: #1D9E75;
+        }
+
+        .fmt-btn.active {
+            background: #1D9E75;
+            border-color: #1D9E75;
+            color: #fff;
+        }
+
+    .pitch-wrap {
+        flex: 1;
+        display: flex;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+    }
+
+    .pitch-svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
+
+    .pitch-actions {
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .btn-clear {
+        font-size: 12px;
+        font-weight: 500;
+        padding: 6px 16px;
+        border: 1.5px solid #e5e7eb;
+        border-radius: 20px;
+        background: transparent;
+        color: #888;
+        cursor: pointer;
+    }
+
+        .btn-clear:hover {
+            border-color: #ef4444;
+            color: #ef4444;
+        }
+
+    /* ── Squad panel (fixed sidebar) ── */
+    .squad-panel {
+        flex: 0 0 260px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 16px;
+    }
+
+    .panel-label {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        color: #aaa;
+    }
+
+    .squad-count {
+        font-size: 11px;
+        color: #bbb;
+        margin-left: auto;
+    }
+
+    .panel-header {
+        display: flex;
+        align-items: center;
+    }
+
+    .squad-scroll {
+        flex: 1;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+        .squad-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .squad-scroll::-webkit-scrollbar-thumb {
+            background: #e5e7eb;
+            border-radius: 4px;
+        }
+
+    .player-card {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 10px;
+        background: #f9fafb;
+        border: 1px solid #f0f0f0;
+        border-radius: 10px;
+        cursor: grab;
+        user-select: none;
+    }
+
+        .player-card:hover {
+            background: #f0fdf8;
+            border-color: #a7f3d0;
+        }
+
+        .player-card:active {
+            cursor: grabbing;
+            transform: scale(0.97);
+        }
+
+        .player-card.on-pitch {
+            opacity: 0.35;
+            pointer-events: none;
+        }
+
+    .p-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #1D9E75, #0e6b50);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 700;
+        color: #fff;
+    }
+
+    .p-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .p-name {
+        font-size: 13px;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .p-pos {
+        font-size: 11px;
+        color: #aaa;
+    }
+
+    .p-rating {
+        font-size: 13px;
+        font-weight: 700;
+        color: #1D9E75;
+    }
+</style>
+
+<div class="tac-page-header">
+    <h1>Tactics</h1>
+    <p>Drag players from the squad onto the pitch to set your formation.</p>
+</div>
+
+<div class="tac-layout">
+
+    <!-- Pitch -->
+    <div class="pitch-panel">
+        <div class="formation-bar" id="formationBar">
+            @foreach (var fmt in new[] { "4-3-3", "4-4-2", "3-5-2", "4-2-3-1", "5-3-2" })
+            {
+                <button class="fmt-btn @(fmt == "4-3-3" ? "active" : "")" data-fmt="@fmt">@fmt</button>
+            }
+        </div>
+
+        <div class="pitch-wrap">
+            <svg id="pitchSvg" class="pitch-svg" viewBox="0 0 340 520"
+                 xmlns="http://www.w3.org/2000/svg"></svg>
+        </div>
+
+        <div class="pitch-actions">
+            <button class="btn-clear" id="clearPitch">Clear pitch</button>
+        </div>
+    </div>
+
+    <!-- Squad -->
+    <div class="squad-panel">
+        <div class="panel-header">
+            <div class="panel-label">Squad</div>
+            <div class="squad-count" id="squadCount"></div>
+        </div>
+
+        <div class="squad-scroll" id="squadList">
+            @foreach (var player in Model.Squad)
+            {
+                var initials = string.Concat(player.FullName.Split(' ')
+                    .Select(w => w.Length > 0 ? w[0].ToString() : "")
+                    .Take(2));
+
+                <div class="player-card"
+                     draggable="true"
+                     data-pid="@player.PlayerId"
+                     data-name="@player.FullName"
+                     data-pos="@player.PreferredPosition"
+                     data-rating="@player.OverallRating">
+
+                    <div class="p-avatar">@initials</div>
+
+                    <div class="p-info">
+                        <div class="p-name">@player.FullName</div>
+                        <div class="p-pos">@player.PreferredPosition</div>
+                    </div>
+
+                    <div class="p-rating">@player.OverallRating</div>
+                </div>
+            }
+        </div>
+    </div>
+
+</div>
+
+<script>
+    const FORMATIONS = {
+        '4-3-3':   [[.5,.92],[.2,.72],[.4,.72],[.6,.72],[.8,.72],[.25,.52],[.5,.52],[.75,.52],[.15,.28],[.5,.28],[.85,.28]],
+        '4-4-2':   [[.5,.92],[.2,.72],[.4,.72],[.6,.72],[.8,.72],[.2,.52],[.4,.52],[.6,.52],[.8,.52],[.35,.25],[.65,.25]],
+        '3-5-2':   [[.5,.92],[.25,.74],[.5,.74],[.75,.74],[.15,.52],[.35,.52],[.55,.52],[.75,.52],[.9,.52],[.35,.25],[.65,.25]],
+        '4-2-3-1': [[.5,.92],[.2,.72],[.4,.72],[.6,.72],[.8,.72],[.35,.55],[.65,.55],[.2,.35],[.5,.35],[.8,.35],[.5,.18]],
+        '5-3-2':   [[.5,.92],[.1,.72],[.3,.72],[.5,.72],[.7,.72],[.9,.72],[.25,.50],[.5,.50],[.75,.50],[.35,.25],[.65,.25]],
+    };
+
+    const POS_LABELS = ['GK','CB','CB','LB','RB','CDM','CM','CM','LW','RW','ST'];
+    const W = 340, H = 520;
+
+    let currentFormation = '4-3-3';
+    let slotAssignments = {};
+    let draggingId = null, draggingFrom = null;
+
+    const svg = document.getElementById('pitchSvg');
+
+    const PLAYERS = Array.from(document.querySelectorAll('.player-card')).map(c => ({
+        id: c.dataset.pid,
+        name: c.dataset.name,
+        pos: c.dataset.pos,
+        rating: c.dataset.rating,
+    }));
+
+    function updateCount() {
+        const placed = Object.keys(slotAssignments).length;
+        document.getElementById('squadCount').textContent =
+            placed ? `${placed} / 11 placed` : `${PLAYERS.length} players`;
+    }
+
+    function pitchBg() {
+        return `<image href="/images/Soccer_thirds.png" x="0" y="0" width="${W}" height="${H}" preserveAspectRatio="xMidYMid slice"/>`;
+    }
+
+    function render() {
+        const slots = FORMATIONS[currentFormation].map(([rx, ry]) => ({ x: rx * W, y: ry * H }));
+        let html = pitchBg();
+
+        slots.forEach((s, i) => {
+            const pid = slotAssignments[i];
+            const player = pid ? PLAYERS.find(p => p.id === pid) : null;
+
+            if (!player) {
+                html += `
+                <g data-slot="${i}">
+                    <circle cx="${s.x}" cy="${s.y}" r="20" fill="rgba(0,0,0,0.25)" stroke="white" stroke-dasharray="5 3"/>
+                    <text x="${s.x}" y="${s.y}" text-anchor="middle" dominant-baseline="middle"
+                          fill="white" font-size="9">${POS_LABELS[i] || ''}</text>
+                </g>`;
+            } else {
+                const inits = player.name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+                const short = player.name.split(' ').pop();
+
+                html += `
+                <g class="player-token" data-slot="${i}" data-token="${player.id}" draggable="true">
+                    <circle cx="${s.x}" cy="${s.y}" r="20" fill="#1D9E75" stroke="white" stroke-width="2"/>
+                    <text x="${s.x}" y="${s.y}" text-anchor="middle" font-size="9" fill="white">${inits}</text>
+                    <text x="${s.x}" y="${s.y + 26}" text-anchor="middle" font-size="8" fill="white">${short}</text>
+                </g>`;
+            }
+        });
+
+        svg.innerHTML = html;
+
+        svg.querySelectorAll('[data-slot]').forEach(el => {
+            el.addEventListener('dragover', e => e.preventDefault());
+            el.addEventListener('drop', e => {
+                e.preventDefault();
+                const slotIdx = parseInt(el.dataset.slot);
+                if (draggingId == null) return;
+
+                if (draggingFrom !== 'squad')
+                    delete slotAssignments[parseInt(draggingFrom)];
+
+                slotAssignments[slotIdx] = draggingId;
+
+                draggingId = null;
+                draggingFrom = null;
+
+                render();
+                syncSquad();
+                updateCount();
+            });
+        });
+
+        svg.querySelectorAll('.player-token').forEach(g => {
+            g.addEventListener('dragstart', () => {
+                draggingId = g.dataset.token;
+                draggingFrom = g.dataset.slot;
+            });
+        });
+    }
+
+    function syncSquad() {
+        const assigned = Object.values(slotAssignments);
+        document.querySelectorAll('.player-card').forEach(c => {
+            c.classList.toggle('on-pitch', assigned.includes(c.dataset.pid));
+        });
+    }
+
+    document.querySelectorAll('.player-card').forEach(card => {
+        card.addEventListener('dragstart', () => {
+            draggingId = card.dataset.pid;
+            draggingFrom = 'squad';
+        });
+    });
+
+    document.getElementById('formationBar').querySelectorAll('.fmt-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            currentFormation = btn.dataset.fmt;
+            slotAssignments = {};
+            document.querySelectorAll('.fmt-btn').forEach(b => b.classList.toggle('active', b === btn));
+            render();
+            syncSquad();
+            updateCount();
+        });
+    });
+
+    document.getElementById('clearPitch').addEventListener('click', () => {
+        slotAssignments = {};
+        render();
+        syncSquad();
+        updateCount();
+    });
+
+    render();
+    updateCount();
+</script>

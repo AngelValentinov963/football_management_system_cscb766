@@ -23,9 +23,13 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
-
+builder.Services.AddScoped<TeamFormService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<SessionMatchStore>();
+builder.Services.AddScoped<SquadService>();
+builder.Services.AddScoped<FormationMatchupService>();
+builder.Services.AddScoped<MatchEngine>();
+builder.Services.AddScoped<SeasonService>();
 
 // ---------------- BUILD APP ----------------
 var app = builder.Build();

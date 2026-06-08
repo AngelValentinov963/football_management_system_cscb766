@@ -54,22 +54,25 @@ namespace football_management_system_cscb.Controllers
                     .First();
             }
 
-            var model = season.Fixtures
-                .GroupBy(f => f.Week)
-                .OrderBy(g => g.Key)
-                .Select(g => new WeeklyFixturesViewModel
+                    var model = season.Fixtures
+            .GroupBy(f => f.Week)
+            .OrderBy(g => g.Key)
+            .Select(g => new WeeklyFixturesViewModel
+            {
+                WeekNumber = g.Key,
+                Fixtures = g.Select(f => new FixtureViewModel
                 {
-                    WeekNumber = g.Key,
-                    Fixtures = g.Select(f => new FixtureViewModel
-                    {
-                        Week = f.Week,
-                        HomeTeamName = f.HomeTeam.Name,
-                        AwayTeamName = f.AwayTeam.Name,
-                        HomeGoals = f.HomeGoals,
-                        AwayGoals = f.AwayGoals
-                    }).ToList()
-                })
-                .ToList();
+                    FixtureId = f.Id,
+                    HomeTeamId = f.HomeTeamId,
+                    AwayTeamId = f.AwayTeamId,
+                    HomeTeamName = f.HomeTeam.Name,
+                    AwayTeamName = f.AwayTeam.Name,
+                    HomeGoals = f.HomeGoals,
+                    AwayGoals = f.AwayGoals,
+                    HomeTeamLogoUrl = f.HomeTeam.LogoUrl,
+                    AwayTeamLogoUrl = f.AwayTeam.LogoUrl
+                }).ToList()
+            }).ToList();
 
             return View(model);
         }
@@ -95,6 +98,13 @@ namespace football_management_system_cscb.Controllers
             _db.SaveChanges();
 
             return RedirectToAction("Fixtures");
+        }
+
+        [HttpPost]
+        public IActionResult SimulateWeek(int weekNumber)
+        {
+            _seasonService.SimulateWeek(weekNumber);
+            return Ok();
         }
     }
 }

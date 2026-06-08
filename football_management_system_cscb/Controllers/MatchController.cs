@@ -1,8 +1,11 @@
 ﻿using football_management_system_cscb.Data;
 using football_management_system_cscb.Models;
+using football_management_system_cscb.Models.Formation;
 using football_management_system_cscb.Service;
+using football_management_system_cscb.Services;
 using football_management_system_cscb.ViewModel;
 using football_management_system_cscb.ViewModels;
+using football_management_system_cscb.ViewModels.Season;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,15 +14,19 @@ public class MatchController : Controller
     private readonly MatchEngine _engine;
     private readonly FootballDbContext _db;
     private readonly SessionMatchStore _session;
+    private readonly SquadService _squadService;
 
     public MatchController(
         MatchEngine engine,
         FootballDbContext db,
-        SessionMatchStore session)
+        SessionMatchStore session,
+         SquadService squadService)
     {
         _engine = engine;
         _db = db;
         _session = session;
+        _squadService = squadService; // ✅ ASSIGN IT
+
     }
 
     // -------------------------
@@ -44,33 +51,42 @@ public class MatchController : Controller
     // -------------------------
     // START MATCH
     // -------------------------
-    public async Task<IActionResult> Start(int homeId, int awayId)
+    public async Task<IActionResult> Start(int homeId, int awayId, int fixtureId)
     {
-        var home = await _db.Teams.Include(t => t.Players)
+        var home = await _db.Teams
+            .Include(t => t.Players)
             .FirstOrDefaultAsync(t => t.TeamId == homeId);
 
-        var away = await _db.Teams.Include(t => t.Players)
+        var away = await _db.Teams
+            .Include(t => t.Players)
             .FirstOrDefaultAsync(t => t.TeamId == awayId);
 
         if (home == null || away == null)
             return NotFound("Teams not found");
 
-        var homeSquad = new Squad(home);
-        var awaySquad = new Squad(away);
+        var homeFormation = FormationLibrary.Get(home.DefaultFormation);
+        var awayFormation = FormationLibrary.Get(away.DefaultFormation);
 
-        homeSquad.AutoSelect();
-        awaySquad.AutoSelect();
+        var homeSquad = _squadService.GetSquad(homeId, homeFormation);
+        var awaySquad = _squadService.GetSquad(awayId, awayFormation);
+
+        homeSquad.BuildSquad(home.Players.ToList());
+        awaySquad.BuildSquad(away.Players.ToList());
 
         var state = _engine.StartMatch();
 
-        // store match metadata
         state.HomeTeamId = homeId;
         state.AwayTeamId = awayId;
+
+        // 🔥 STORE SQUADS IN STATE (CRITICAL FIX)
+        state.HomeSquad = homeSquad;
+        state.AwaySquad = awaySquad;
 
         _session.Save(state);
 
         HttpContext.Session.SetInt32("homeId", homeId);
         HttpContext.Session.SetInt32("awayId", awayId);
+        HttpContext.Session.SetInt32("fixtureId", fixtureId);
 
         return RedirectToAction("Index");
     }
@@ -98,15 +114,29 @@ public class MatchController : Controller
         var away = await _db.Teams.Include(t => t.Players)
             .FirstAsync(t => t.TeamId == awayId);
 
-        var homeSquad = new Squad(home);
-        var awaySquad = new Squad(away);
+        var homeFormation = FormationLibrary.Get(home.DefaultFormation);
+        var awayFormation = FormationLibrary.Get(away.DefaultFormation);
 
-        homeSquad.AutoSelect();
-        awaySquad.AutoSelect();
+        var homeSquad = _squadService.GetSquad(homeId, homeFormation);
+        var awaySquad = _squadService.GetSquad(awayId, awayFormation);
 
         _engine.AdvanceMinute(state, homeSquad, awaySquad);
 
         _session.Save(state);
+
+        // 🟢 HERE is where you use it
+        if (state.CurrentMinute >= 90 && !state.IsPaused)
+        {
+            var fixtureId = HttpContext.Session.GetInt32("fixtureId");
+
+            if (fixtureId != null)
+            {
+                await SaveMatchResult(state, fixtureId);
+            }
+
+            state.IsFinished = true;
+            _session.Save(state);
+        }
 
         return Json(state);
     }
@@ -118,5 +148,20 @@ public class MatchController : Controller
     public IActionResult State()
     {
         return Json(_session.Load());
+    }
+
+    private async Task SaveMatchResult(MatchState state,int? fixtureId)
+    {
+       var fixture = await _db.Fixtures
+            .FirstOrDefaultAsync(f => f.Id == fixtureId);
+       
+       if (fixture == null)
+           throw new Exception("Fixture not found");
+       
+       fixture.HomeGoals = state.HomeGoals;
+       fixture.AwayGoals = state.AwayGoals;
+       fixture.Played = true;
+
+        await _db.SaveChangesAsync();
     }
 }

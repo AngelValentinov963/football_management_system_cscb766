@@ -1,71 +1,393 @@
 ﻿@model List<football_management_system_cscb.ViewModel.WeeklyFixturesViewModel>
 
-<h2>📅 Season Fixtures</h2>
+@{
+    ViewData["Title"] = "Fixtures";
+}
 
-<div id="seasonCarousel" class="carousel slide" data-bs-ride="false">
+<style>
 
-    <div class="carousel-inner">
+    .played-match {
+        cursor: default;
+    }
 
+        .played-match:hover {
+            background: rgba(255,255,255,.025);
+            border-color: rgba(255,255,255,.05);
+            transform: none;
+        }
+
+    .fixture-link,
+    .fixture-link:hover,
+    .fixture-link:focus,
+    .fixture-link:active,
+    .fixture-link:visited {
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .team-logo {
+        width: 28px;
+        height: 28px;
+        object-fit: contain;
+        margin: 0 8px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.08);
+        padding: 2px;
+    }
+
+    .fx-team {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .fx-wrap {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 8px 4px 40px;
+    }
+
+    .fx-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 8px 0 22px;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+    .fx-title {
+        font-family: 'Outfit',sans-serif;
+        font-weight: 700;
+        font-size: 30px;
+        color: #fff;
+        margin: 0;
+        letter-spacing: .3px;
+    }
+
+        .fx-title .dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent,#00d97e);
+            box-shadow: 0 0 14px var(--accent,#00d97e);
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+    .fx-sub {
+        color: rgba(255,255,255,.55);
+        font-size: 13px;
+        margin-top: 4px;
+    }
+
+    .fx-nav {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: rgba(255,255,255,.04);
+        border: 1px solid rgba(255,255,255,.08);
+        border-radius: 999px;
+        padding: 6px;
+        backdrop-filter: blur(10px);
+    }
+
+        .fx-nav button {
+            background: transparent;
+            border: 0;
+            color: #fff;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: .2s;
+        }
+
+            .fx-nav button:hover {
+                background: rgba(0,217,126,.15);
+                color: var(--accent,#00d97e);
+            }
+
+        .fx-nav .week-pill {
+            min-width: 130px;
+            text-align: center;
+            color: #fff;
+            font-weight: 600;
+            letter-spacing: .4px;
+            font-family: 'Outfit',sans-serif;
+        }
+
+            .fx-nav .week-pill small {
+                display: block;
+                font-size: 10px;
+                color: rgba(255,255,255,.5);
+                font-weight: 500;
+                letter-spacing: 2px;
+                text-transform: uppercase;
+            }
+
+    .week-card {
+        background: linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.015));
+        border: 1px solid rgba(255,255,255,.08);
+        border-radius: 20px;
+        padding: 22px 22px 12px;
+        backdrop-filter: blur(12px);
+        box-shadow: 0 10px 40px rgba(0,0,0,.35);
+    }
+
+    .fx-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .fx-row {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: center;
+        gap: 16px;
+        padding: 14px 18px;
+        border-radius: 14px;
+        background: rgba(255,255,255,.025);
+        border: 1px solid rgba(255,255,255,.05);
+        transition: .2s;
+    }
+
+        .fx-row:hover {
+            background: rgba(0,217,126,.06);
+            border-color: rgba(0,217,126,.25);
+            transform: translateY(-1px);
+        }
+
+    .fx-team {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #fff;
+        font-weight: 500;
+    }
+
+        .fx-team.home {
+            justify-content: flex-end;
+            text-align: right;
+        }
+
+        .fx-team.away {
+            justify-content: flex-start;
+            text-align: left;
+        }
+
+        .fx-team.winner {
+            color: var(--accent,#00d97e);
+            font-weight: 700;
+        }
+
+    .fx-score {
+        min-width: 110px;
+        text-align: center;
+    }
+
+        .fx-score .score {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Outfit',sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: #fff;
+            background: rgba(0,0,0,.35);
+            padding: 6px 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,.08);
+        }
+
+        .fx-score .vs {
+            color: rgba(255,255,255,.4);
+            font-size: 13px;
+            letter-spacing: 3px;
+            font-weight: 600;
+            padding: 6px 16px;
+            border-radius: 10px;
+            border: 1px dashed rgba(255,255,255,.12);
+        }
+
+    .fx-empty {
+        padding: 40px;
+        text-align: center;
+        color: rgba(255,255,255,.4);
+    }
+</style>
+
+<div class="fx-wrap">
+
+    <div class="fx-head">
+        <div>
+            <h2 class="fx-title"><span class="dot"></span>Season Fixtures</h2>
+            <div class="fx-sub">@Model.Count match weeks scheduled</div>
+        </div>
+
+        <div class="fx-nav">
+
+            <button type="button" onclick="fxNav(-1)">‹</button>
+
+            <div class="week-pill">
+                <small>Match Week</small>
+                <span id="fxWeekLabel">1 / @Model.Count</span>
+            </div>
+
+            <button type="button" onclick="fxNav(1)">›</button>
+
+            <!-- 🔥 SIMULATE WEEK BUTTON -->
+            <button type="button"
+                    onclick="simulateWeek()"
+                    style="
+                margin-left:10px;
+                padding:6px 12px;
+                border-radius:8px;
+                border:1px solid rgba(255,255,255,.2);
+                background:#00d97e;
+                color:#000;
+                font-weight:600;
+                cursor:pointer;">
+                Simulate Week
+            </button>
+
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="week-card fx-empty">No fixtures scheduled yet.</div>
+    }
+
+    <div id="fxWeeks">
         @{
-            var first = true;
+            var idx = 0;
         }
 
         @foreach (var week in Model)
         {
-            <div class="carousel-item @(first ? "active" : "")">
-                <div class="week-container p-3">
+            <div class="week-card fx-week" data-idx="@idx" style="display:@(idx == 0 ? "block" : "none");">
+                <div class="fx-list">
 
-                    <h3 class="text-white mb-3">
-                        Week @week.WeekNumber
-                    </h3>
+                    @foreach (var f in week.Fixtures)
+                    {
+                        var played = f.HomeGoals.HasValue && f.AwayGoals.HasValue;
+                        var homeWin = played && f.HomeGoals > f.AwayGoals;
+                        var awayWin = played && f.AwayGoals > f.HomeGoals;
 
-                    <table class="table table-dark table-striped table-hover">
-                        <thead>
-                            <tr>
-                                <th>Home</th>
-                                <th style="text-align:center;">Score</th>
-                                <th>Away</th>
-                            </tr>
-                        </thead>
+                        if (!played)
+                        {
+                            <a class="fx-row fixture-link"
+                               asp-controller="Match"
+                               asp-action="Start"
+                               asp-route-homeId="@f.HomeTeamId"
+                               asp-route-awayId="@f.AwayTeamId"
+                               asp-route-fixtureId="@f.FixtureId">
 
-                        <tbody>
-                            @foreach (var f in week.Fixtures)
-                            {
-                                <tr>
-                                    <td class="text-center">@f.HomeTeamName</td>
+                                <div class="fx-team home @(homeWin ? "winner" : "")">
+                                    <span>@f.HomeTeamName</span>
+                                    <img class="team-logo" src="@f.HomeTeamLogoUrl" />
+                                </div>
 
-                                    <td class="text-center">
-                                        @if (f.HomeGoals.HasValue && f.AwayGoals.HasValue)
-                                        {
-                                            <strong>@f.HomeGoals - @f.AwayGoals</strong>
-                                        }
-                                        else
-                                        {
-                                            <span class="text-muted">vs</span>
-                                        }
-                                    </td>
+                                <div class="fx-score">
+                                    <span class="vs">VS</span>
+                                </div>
 
-                                    <td class="text-center">@f.AwayTeamName</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
+                                <div class="fx-team away @(awayWin ? "winner" : "")">
+                                    <img class="team-logo" src="@f.AwayTeamLogoUrl" />
+                                    <span>@f.AwayTeamName</span>
+                                </div>
+
+                            </a>
+                        }
+                        else
+                        {
+                            <div class="fx-row played-match">
+
+                                <div class="fx-team home @(homeWin ? "winner" : "")">
+                                    <span>@f.HomeTeamName</span>
+                                    <img class="team-logo" src="@f.HomeTeamLogoUrl" />
+                                </div>
+
+                                <div class="fx-score">
+                                    <span class="score">
+                                        @f.HomeGoals
+                                        <span style="color:rgba(255,255,255,.3);">–</span>
+                                        @f.AwayGoals
+                                    </span>
+                                </div>
+
+                                <div class="fx-team away @(awayWin ? "winner" : "")">
+                                    <img class="team-logo" src="@f.AwayTeamLogoUrl" />
+                                    <span>@f.AwayTeamName</span>
+                                </div>
+
+                            </div>
+                        }
+                    }
 
                 </div>
             </div>
 
-            first = false;
+            idx++;
         }
-
     </div>
-
-    <!-- Controls -->
-    <button class="carousel-control-prev" type="button" data-bs-target="#seasonCarousel" data-bs-slide="prev">
-        <span class="carousel-control-prev-icon"></span>
-    </button>
-
-    <button class="carousel-control-next" type="button" data-bs-target="#seasonCarousel" data-bs-slide="next">
-        <span class="carousel-control-next-icon"></span>
-    </button>
-
 </div>
+
+<script>
+    (function () {
+        const weeks = document.querySelectorAll('.fx-week');
+        const total = weeks.length;
+        const label = document.getElementById('fxWeekLabel');
+        const weekInput = document.getElementById("weekNumberInput");
+
+        let cur = 0;
+
+        window.fxNav = function (dir) {
+            if (!total) return;
+
+            cur = (cur + dir + total) % total;
+
+            weeks.forEach(w => w.style.display = (+w.dataset.idx === cur ? 'block' : 'none'));
+
+            label.textContent = (cur + 1) + ' / ' + total;
+
+            // sync simulate button
+            if (weekInput) weekInput.value = (cur + 1);
+        };
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'ArrowLeft') fxNav(-1);
+            if (e.key === 'ArrowRight') fxNav(1);
+        });
+    })();
+</script>
+
+<script>
+    async function simulateWeek() {
+        const weekNumber = document.getElementById('fxWeekLabel')
+            .textContent.split('/')[0].trim();
+
+        const res = await fetch('/Season/SimulateWeek', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams({
+                weekNumber: weekNumber
+            })
+        });
+
+        if (res.ok) {
+            alert("Week " + weekNumber + " simulated!");
+            location.reload(); // refresh ONLY after success
+        } else {
+            alert("Simulation failed");
+        }
+    }
+</script>
