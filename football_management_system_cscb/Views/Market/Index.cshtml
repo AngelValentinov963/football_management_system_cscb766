@@ -1,12 +1,61 @@
-@model IEnumerable<football_management_system_cscb.ViewModels.PlayerViewModel>
-@{ ViewData["Title"] = "Transfer Market"; }
+@model football_management_system_cscb.ViewModels.MarketViewModel
+
+@{
+    ViewData["Title"] = "Transfer Market";
+}
 
 <div class="page-header">
     <div>
         <h1>Transfer Market</h1>
-        <p class="subtitle">Sign new talent to strengthen your squad.</p>
+        <p class="subtitle">
+            @Model.Team.Name — Budget: €@string.Format("{0:N0}", Model.Team.Budget)
+        </p>
     </div>
 </div>
+
+<!-- ================= MY PLAYERS ================= -->
+<h2>My Squad</h2>
+
+<div class="player-table card mb-4">
+    <div class="table-responsive scroll-table">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Player</th>
+                    <th>Age</th>
+                    <th>Nationality</th>
+                    <th>Position</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (Model.MyPlayers == null || !Model.MyPlayers.Any())
+                {
+                    <tr>
+                        <td colspan="5" class="text-muted">No players in your squad.</td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var player in Model.MyPlayers)
+                    {
+                        <tr>
+                            <td><strong>@player.FullName</strong></td>
+                            <td>@(DateTime.Today.Year - player.BirthDate.Year)</td>
+                            <td>@player.Nationality</td>
+                            <td>@player.PreferredPosition</td>
+                            <td>€@string.Format("{0:N0}", player.MarketValue ?? 0)</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ================= TRANSFER MARKET ================= -->
+<h2>Available Players</h2>
 
 <div class="player-table card">
     <div class="table-responsive scroll-table">
@@ -17,24 +66,34 @@
                     <th>Age</th>
                     <th>Nationality</th>
                     <th>Position</th>
-                    <th>Asking Price</th>
+                    <th>Price</th>
+                    <th></th>
                 </tr>
             </thead>
+
             <tbody>
-                @if (Model == null || !Model.Any())
+                @if (Model.AvailablePlayers == null || !Model.AvailablePlayers.Any())
                 {
-                    <p>No players available.</p>
+                    <tr>
+                        <td colspan="6" class="text-muted">No players available on the market.</td>
+                    </tr>
                 }
                 else
                 {
-                    foreach (var player in Model)
+                    foreach (var player in Model.AvailablePlayers)
                     {
                         <tr>
                             <td><strong>@player.FullName</strong></td>
                             <td>@(DateTime.Today.Year - player.BirthDate.Year)</td>
                             <td>@player.Nationality</td>
-                            <td><span class="position-badge">@player.PreferredPosition</span></td>
-                            <td><strong>€@string.Format("{0:N0}", player.MarketValue ?? 0)</strong></td>
+                            <td>@player.PreferredPosition</td>
+                            <td>€@string.Format("{0:N0}", player.MarketValue ?? 0)</td>
+                            <td>
+                                <form asp-action="Buy" method="post">
+                                    <input type="hidden" name="playerId" value="@player.PlayerId" />
+                                    <button class="btn btn-success btn-sm">Buy</button>
+                                </form>
+                            </td>
                         </tr>
                     }
                 }

@@ -29,5 +29,8 @@ namespace football_management_system_cscb.Models
         public string DefaultFormation { get; set; }
 
 
+        [Column("Budget")]
+        public decimal Budget { get; set; }
+
     }
 }

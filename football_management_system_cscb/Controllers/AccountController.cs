@@ -26,6 +26,9 @@ public class AccountController : Controller
 
         if (user != null)
         {
+            // Save logged-in user to session
+            HttpContext.Session.SetInt32("UserId", user.UserId);
+
             return RedirectToAction("Index", "Home");
         }
 

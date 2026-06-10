@@ -6,6 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // ---------------- SERVICES ----------------
 builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<PlayerValueService>();
 
 builder.Services.AddDbContext<FootballDbContext>(options =>
     options.UseSqlServer(

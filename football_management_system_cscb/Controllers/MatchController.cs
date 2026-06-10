@@ -78,7 +78,6 @@ public class MatchController : Controller
         state.HomeTeamId = homeId;
         state.AwayTeamId = awayId;
 
-        // 🔥 STORE SQUADS IN STATE (CRITICAL FIX)
         state.HomeSquad = homeSquad;
         state.AwaySquad = awaySquad;
 

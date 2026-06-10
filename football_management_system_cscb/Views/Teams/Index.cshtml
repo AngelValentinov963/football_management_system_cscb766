@@ -29,9 +29,36 @@
                         <td>@team.City</td>
                         <td>@team.FoundationYear</td>
                         <td>@team.Stadium</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary"
+                                    onclick="selectTeam(@team.TeamId)">
+                                Choose
+                            </button>
+                        </td>
                     </tr>
                 }
             </tbody>
         </table>
     </div>
 </div>
+
+
+<script>
+    function selectTeam(teamId) {
+
+        if (!confirm("Choose this team for your career?"))
+            return;
+
+        fetch('/Teams/AssignTeam?teamId=' + teamId, {
+            method: 'POST'
+        })
+        .then(response => {
+            if (response.ok) {
+                window.location.href = '/Squad/Index';
+            }
+            else {
+                alert('Failed to assign team.');
+            }
+        });
+    }
+</script>

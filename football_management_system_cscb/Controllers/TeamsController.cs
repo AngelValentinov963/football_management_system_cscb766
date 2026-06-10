@@ -14,7 +14,7 @@ public class TeamsController : Controller
     }
 
     // GET: TEAMS
-    public async Task<IActionResult> Index()    
+    public async Task<IActionResult> Index()
     {
         return View(await _context.Teams.ToListAsync());
     }
@@ -146,5 +146,29 @@ public class TeamsController : Controller
     private bool TeamExists(int? teamid)
     {
         return _context.Teams.Any(e => e.TeamId == teamid);
+    }
+
+    [HttpPost]
+    public IActionResult AssignTeam(int teamId)
+    {
+        var userId = HttpContext.Session.GetInt32("UserId");
+
+        if (userId == null)
+            return Unauthorized();
+
+        var user = _context.Users
+            .FirstOrDefault(u => u.UserId == userId.Value);
+
+        if (user == null)
+            return Unauthorized();
+        if (user.TeamId != null)
+        {
+            return BadRequest("Team already selected.");
+        }
+        user.TeamId = teamId;
+
+        _context.SaveChanges();
+
+        return Ok();
     }
 }

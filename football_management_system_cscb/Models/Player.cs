@@ -22,7 +22,11 @@ namespace football_management_system_cscb.Models
         public string? Nationality { get; set; }
 
         [Column("team_id")]
-        public int TeamId { get; set; }
+        public int? TeamId { get; set; }
+
+
+       
+
 
         [Column("overall_rating")]
         public int? OverallRating { get; set; }
@@ -62,5 +66,8 @@ namespace football_management_system_cscb.Models
 
         [Column("goalkeeping")]
         public int Goalkeeping { get; set; }
+
+        [Column("IsListedForTransfer")]
+        public bool IsListedForTransfer { get; set; } = false;
     }
 }
