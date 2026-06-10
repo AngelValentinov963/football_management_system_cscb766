@@ -1,417 +1,425 @@
 @model football_management_system_cscb.ViewModel.SquadViewModel
-
 @{
-    ViewData["Title"] = "Tactics";
+    ViewData["Title"] = "Squad & Tactics";
 }
 
-<style>
-    .tac-page-header {
-        margin-bottom: 24px;
-    }
-
-        .tac-page-header h1 {
-            font-size: 26px;
-            font-weight: 600;
-            color: var(--text-primary, #111);
-            margin: 0 0 4px;
+@section Styles {
+    <style>
+        .sq-wrap {
+            display: grid;
+            grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+            gap: 18px;
+            min-width: 0;
         }
 
-        .tac-page-header p {
-            font-size: 14px;
-            color: var(--text-muted, #888);
+        @@media (max-width: 1200px) {
+            .sq-wrap {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .sq-card {
+            background: radial-gradient(900px 300px at -10% -20%, rgba(56,189,248,.12), transparent 60%), linear-gradient(180deg, #0f1830 0%, #0a1226 100%);
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 18px;
+            padding: 16px;
+            color: #e7ecf5;
+            min-width: 0;
+            box-shadow: 0 30px 60px -30px rgba(0,0,0,.6);
+        }
+
+        .sq-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .sq-title {
+            font-weight: 800;
+            letter-spacing: .3px;
+            font-size: clamp(16px, 1.6vw, 20px);
             margin: 0;
         }
 
-    /* 🔥 MAIN FIX: layout balance */
-    .tac-layout {
-        display: flex;
-        gap: 20px;
-        height: 640px;
-        align-items: stretch;
-    }
-
-    /* ── Pitch panel (takes remaining space) ── */
-    .pitch-panel {
-        flex: 1 1 auto;
-        min-width: 0;
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-        background: #fff;
-        border: 1px solid #e5e7eb;
-        border-radius: 14px;
-        padding: 16px;
-    }
-
-    .formation-bar {
-        display: flex;
-        gap: 6px;
-        flex-wrap: wrap;
-    }
-
-    .fmt-btn {
-        font-size: 12px;
-        font-weight: 500;
-        padding: 5px 14px;
-        border: 1.5px solid #d1d5db;
-        border-radius: 20px;
-        background: transparent;
-        color: #555;
-        cursor: pointer;
-        transition: all .15s;
-    }
-
-        .fmt-btn:hover {
-            border-color: #1D9E75;
-            color: #1D9E75;
+        .sq-sub {
+            color: #9fb0c9;
+            font-size: 12px;
         }
 
-        .fmt-btn.active {
-            background: #1D9E75;
-            border-color: #1D9E75;
-            color: #fff;
+        .formation-bar {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
         }
 
-    .pitch-wrap {
-        flex: 1;
-        display: flex;
-        border-radius: 10px;
-        overflow: hidden;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.10);
-    }
-
-    .pitch-svg {
-        width: 100%;
-        height: 100%;
-        display: block;
-    }
-
-    .pitch-actions {
-        display: flex;
-        justify-content: flex-end;
-    }
-
-    .btn-clear {
-        font-size: 12px;
-        font-weight: 500;
-        padding: 6px 16px;
-        border: 1.5px solid #e5e7eb;
-        border-radius: 20px;
-        background: transparent;
-        color: #888;
-        cursor: pointer;
-    }
-
-        .btn-clear:hover {
-            border-color: #ef4444;
-            color: #ef4444;
-        }
-
-    /* ── Squad panel (fixed sidebar) ── */
-    .squad-panel {
-        flex: 0 0 260px;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        background: #fff;
-        border: 1px solid #e5e7eb;
-        border-radius: 14px;
-        padding: 16px;
-    }
-
-    .panel-label {
-        font-size: 11px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: .08em;
-        color: #aaa;
-    }
-
-    .squad-count {
-        font-size: 11px;
-        color: #bbb;
-        margin-left: auto;
-    }
-
-    .panel-header {
-        display: flex;
-        align-items: center;
-    }
-
-    .squad-scroll {
-        flex: 1;
-        overflow-y: auto;
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-    }
-
-        .squad-scroll::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .squad-scroll::-webkit-scrollbar-thumb {
-            background: #e5e7eb;
-            border-radius: 4px;
-        }
-
-    .player-card {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 8px 10px;
-        background: #f9fafb;
-        border: 1px solid #f0f0f0;
-        border-radius: 10px;
-        cursor: grab;
-        user-select: none;
-    }
-
-        .player-card:hover {
-            background: #f0fdf8;
-            border-color: #a7f3d0;
-        }
-
-        .player-card:active {
-            cursor: grabbing;
-            transform: scale(0.97);
-        }
-
-        .player-card.on-pitch {
-            opacity: 0.35;
-            pointer-events: none;
-        }
-
-    .p-avatar {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #1D9E75, #0e6b50);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 11px;
-        font-weight: 700;
-        color: #fff;
-    }
-
-    .p-info {
-        flex: 1;
-        min-width: 0;
-    }
-
-    .p-name {
-        font-size: 13px;
-        font-weight: 600;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .p-pos {
-        font-size: 11px;
-        color: #aaa;
-    }
-
-    .p-rating {
-        font-size: 13px;
-        font-weight: 700;
-        color: #1D9E75;
-    }
-</style>
-
-<div class="tac-page-header">
-    <h1>Tactics</h1>
-    <p>Drag players from the squad onto the pitch to set your formation.</p>
-</div>
-
-<div class="tac-layout">
-
-    <!-- Pitch -->
-    <div class="pitch-panel">
-        <div class="formation-bar" id="formationBar">
-            @foreach (var fmt in new[] { "4-3-3", "4-4-2", "3-5-2", "4-2-3-1", "5-3-2" })
-            {
-                <button class="fmt-btn @(fmt == "4-3-3" ? "active" : "")" data-fmt="@fmt">@fmt</button>
+            .formation-bar button {
+                background: rgba(255,255,255,.04);
+                color: #cfe0ff;
+                border: 1px solid rgba(255,255,255,.08);
+                padding: 6px 10px;
+                border-radius: 999px;
+                font-size: 12px;
+                cursor: pointer;
             }
+
+                .formation-bar button.active {
+                    background: linear-gradient(135deg,#22d3ee,#3b82f6);
+                    color: #04111f;
+                    border-color: transparent;
+                    font-weight: 700;
+                }
+
+        .pitch-shell {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 22;
+            max-height: calc(100vh - 220px);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,.08);
+            background: #0a1f12;
+        }
+
+            .pitch-shell svg {
+                position: absolute;
+                inset: 0;
+                width: 100%;
+                height: 100%;
+                display: block;
+            }
+
+        .slot {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            width: clamp(54px, 7.2%, 84px);
+            aspect-ratio: 1/1;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 25%, rgba(255,255,255,.25), rgba(255,255,255,.04) 60%), rgba(255,255,255,.06);
+            border: 2px dashed rgba(255,255,255,.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #eaf2ff;
+            font-size: 11px;
+            text-align: center;
+            padding: 4px;
+            backdrop-filter: blur(2px);
+        }
+
+            .slot.filled {
+                border-style: solid;
+                background: linear-gradient(135deg,#1e3a8a,#0ea5e9);
+                border-color: rgba(255,255,255,.65);
+                font-weight: 700;
+                box-shadow: 0 10px 24px -10px rgba(14,165,233,.6);
+            }
+
+            .slot .pos {
+                position: absolute;
+                top: -10px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: #0b1226;
+                color: #a7d8ff;
+                font-size: 10px;
+                padding: 2px 6px;
+                border-radius: 999px;
+                border: 1px solid rgba(255,255,255,.15);
+            }
+
+        .placed-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+            color: #cfe0ff;
+            font-size: 13px;
+        }
+
+            .placed-bar .pill {
+                background: rgba(255,255,255,.06);
+                padding: 4px 10px;
+                border-radius: 999px;
+                border: 1px solid rgba(255,255,255,.08);
+            }
+
+            .placed-bar button {
+                margin-left: auto;
+                background: transparent;
+                border: 1px solid rgba(255,255,255,.15);
+                color: #e7ecf5;
+                padding: 6px 12px;
+                border-radius: 10px;
+                cursor: pointer;
+            }
+
+        .roster {
+            display: grid;
+            gap: 8px;
+            max-height: calc(100vh - 220px);
+            overflow: auto;
+            padding-right: 6px;
+        }
+
+            .roster::-webkit-scrollbar {
+                width: 8px;
+            }
+
+            .roster::-webkit-scrollbar-thumb {
+                background: rgba(255,255,255,.12);
+                border-radius: 8px;
+            }
+
+        .pcard {
+            display: grid;
+            grid-template-columns: 40px 1fr auto;
+            gap: 10px;
+            align-items: center;
+            background: rgba(255,255,255,.04);
+            border: 1px solid rgba(255,255,255,.08);
+            padding: 10px 12px;
+            border-radius: 12px;
+            cursor: grab;
+            transition: transform .15s ease, background .2s;
+        }
+
+            .pcard:hover {
+                transform: translateY(-1px);
+                background: rgba(255,255,255,.07);
+            }
+
+            .pcard:active {
+                cursor: grabbing;
+            }
+
+            .pcard.on-pitch {
+                opacity: .45;
+                filter: grayscale(.3);
+                pointer-events: none;
+            }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg,#22d3ee,#3b82f6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: #04111f;
+        }
+
+        .pname {
+            font-weight: 600;
+        }
+
+        .pmeta {
+            font-size: 11px;
+            color: #9fb0c9;
+        }
+
+        .rating {
+            background: rgba(251,191,36,.15);
+            color: #fde68a;
+            border: 1px solid rgba(251,191,36,.35);
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        .search-input {
+            width: 100%;
+            background: rgba(255,255,255,.04);
+            border: 1px solid rgba(255,255,255,.1);
+            color: #e7ecf5;
+            padding: 8px 12px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+
+            .search-input::placeholder {
+                color: #6b7c99;
+            }
+    </style>
+}
+
+<div class="sq-wrap">
+    <div class="sq-card">
+        <div class="sq-head">
+            <div>
+                <h2 class="sq-title">Tactical Board</h2>
+                <div class="sq-sub">Drag players from the right onto the pitch</div>
+            </div>
+            <div class="formation-bar" id="formationBar">
+                <button data-f="4-3-3" class="active">4-3-3</button>
+                <button data-f="4-4-2">4-4-2</button>
+                <button data-f="3-5-2">3-5-2</button>
+                <button data-f="4-2-3-1">4-2-3-1</button>
+                <button data-f="5-3-2">5-3-2</button>
+            </div>
         </div>
 
-        <div class="pitch-wrap">
-            <svg id="pitchSvg" class="pitch-svg" viewBox="0 0 340 520"
-                 xmlns="http://www.w3.org/2000/svg"></svg>
+        <div class="pitch-shell" id="pitchShell">
+            <svg viewBox="0 0 160 220" preserveAspectRatio="none" aria-hidden="true">
+                <defs>
+                    <linearGradient id="grass" x1="0" x2="0" y1="0" y2="1">
+                        <stop offset="0" stop-color="#0f5132" />
+                        <stop offset="1" stop-color="#0a3d24" />
+                    </linearGradient>
+                    <pattern id="stripes" width="20" height="20" patternUnits="userSpaceOnUse">
+                        <rect width="20" height="20" fill="url(#grass)" />
+                        <rect width="20" height="10" fill="rgba(255,255,255,.04)" />
+                    </pattern>
+                </defs>
+                <rect width="160" height="220" fill="url(#stripes)" />
+                <g fill="none" stroke="rgba(255,255,255,.55)" stroke-width=".6">
+                    <rect x="4" y="4" width="152" height="212" rx="2" />
+                    <line x1="4" y1="110" x2="156" y2="110" />
+                    <circle cx="80" cy="110" r="16" />
+                    <circle cx="80" cy="110" r="1.2" fill="rgba(255,255,255,.55)" />
+                    <rect x="40" y="4" width="80" height="26" />
+                    <rect x="55" y="4" width="50" height="12" />
+                    <rect x="40" y="190" width="80" height="26" />
+                    <rect x="55" y="204" width="50" height="12" />
+                    <circle cx="80" cy="32" r="14" />
+                    <circle cx="80" cy="188" r="14" />
+                </g>
+            </svg>
         </div>
 
-        <div class="pitch-actions">
-            <button class="btn-clear" id="clearPitch">Clear pitch</button>
+        <div class="placed-bar">
+            <span class="pill">On pitch: <strong id="placedNum">0</strong> / 11</span>
+            <span class="pill" id="formationLabel">4-3-3</span>
+            <button id="clearPitch">Clear pitch</button>
+            <button id="saveFormation" style="margin-left:8px; background:linear-gradient(135deg,#00d97e,#00a35f); color:#062014; border:none; padding:6px 14px; border-radius:10px; font-weight:700; cursor:pointer;">Save Formation</button>
         </div>
+        <div id="saveMsg" style="margin-top:8px; font-size:13px; color:#00d97e; display:none;">Formation saved!</div>
     </div>
 
-    <!-- Squad -->
-    <div class="squad-panel">
-        <div class="panel-header">
-            <div class="panel-label">Squad</div>
-            <div class="squad-count" id="squadCount"></div>
+    <div class="sq-card">
+        <div class="sq-head">
+            <div>
+                <h2 class="sq-title">Roster</h2>
+                <div class="sq-sub">@Model.Squad.Count players available</div>
+            </div>
         </div>
-
-        <div class="squad-scroll" id="squadList">
-            @foreach (var player in Model.Squad)
+        <input class="search-input" id="rosterSearch" placeholder="Search player..." />
+        <div class="roster" id="squadList">
+            @foreach (var p in Model.Squad)
             {
-                var initials = string.Concat(player.FullName.Split(' ')
-                    .Select(w => w.Length > 0 ? w[0].ToString() : "")
-                    .Take(2));
-
-                <div class="player-card"
+                <div class="pcard"
                      draggable="true"
-                     data-pid="@player.PlayerId"
-                     data-name="@player.FullName"
-                     data-pos="@player.PreferredPosition"
-                     data-rating="@player.OverallRating">
-
-                    <div class="p-avatar">@initials</div>
-
-                    <div class="p-info">
-                        <div class="p-name">@player.FullName</div>
-                        <div class="p-pos">@player.PreferredPosition</div>
+                     data-id="@p.PlayerId"
+                     data-pos="@p.PreferredPosition"
+                     data-name="@p.FullName">
+                    <div class="avatar">@p.FullName[0]</div>
+                    <div>
+                        <div class="pname">@p.FullName</div>
+                        <div class="pmeta">@p.PreferredPosition</div>
                     </div>
-
-                    <div class="p-rating">@player.OverallRating</div>
+                    <div class="rating">@p.OverallRating</div>
                 </div>
             }
         </div>
     </div>
-
 </div>
 
-<script>
+@section Scripts {
+    <script>
+        const FORMATIONS = {
+            "4-3-3":   [["GK",50,92],["LB",18,75],["CB",38,78],["CB",62,78],["RB",82,75],["CM",30,55],["CM",50,58],["CM",70,55],["LW",20,28],["ST",50,22],["RW",80,28]],
+            "4-4-2":   [["GK",50,92],["LB",18,75],["CB",38,78],["CB",62,78],["RB",82,75],["LM",20,50],["CM",40,52],["CM",60,52],["RM",80,50],["ST",40,24],["ST",60,24]],
+            "3-5-2":   [["GK",50,92],["CB",28,78],["CB",50,80],["CB",72,78],["LM",16,55],["CM",36,55],["CM",50,50],["CM",64,55],["RM",84,55],["ST",40,24],["ST",60,24]],
+            "4-2-3-1": [["GK",50,92],["LB",18,75],["CB",38,78],["CB",62,78],["RB",82,75],["CDM",38,60],["CDM",62,60],["CAM",50,42],["LW",20,32],["RW",80,32],["ST",50,20]],
+            "5-3-2":   [["GK",50,92],["LWB",14,72],["CB",32,80],["CB",50,82],["CB",68,80],["RWB",86,72],["CM",34,55],["CM",50,50],["CM",66,55],["ST",40,24],["ST",60,24]]
+        };
 
-        const teamId = @Model.TeamId;
+        const shell = document.getElementById('pitchShell');
+        const placedNum = document.getElementById('placedNum');
+        const formationLabel = document.getElementById('formationLabel');
+        let assigned = new Map();
 
+        function renderSlots(name) {
+            shell.querySelectorAll('.slot').forEach(s => s.remove());
+            const layout = FORMATIONS[name];
+            layout.forEach((s, idx) => {
+                const el = document.createElement('div');
+                el.className = 'slot';
+                el.style.left = s[1] + '%';
+                el.style.top  = s[2] + '%';
+                el.dataset.idx = idx;
+                el.innerHTML = `<span class="pos">${s[0]}</span><span class="slot-label">${s[0]}</span>`;
+                el.addEventListener('dragover', e => e.preventDefault());
+                el.addEventListener('drop', e => {
+                    e.preventDefault();
+                    const id = e.dataTransfer.getData('text/plain');
+                    const card = document.querySelector(`.pcard[data-id="${id}"]`);
+                    if (!card) return;
+                    assigned.set(idx, id);
+                    el.classList.add('filled');
+                    el.querySelector('.slot-label').textContent = card.dataset.name.split(' ').slice(-1)[0];
+                    document.querySelectorAll('.pcard').forEach(c =>
+                        c.classList.toggle('on-pitch', [...assigned.values()].includes(c.dataset.id))
+                    );
+                    placedNum.textContent = assigned.size;
+                });
+                shell.appendChild(el);
+            });
+            formationLabel.textContent = name;
+            assigned.clear();
+            placedNum.textContent = 0;
+            document.querySelectorAll('.pcard').forEach(c => c.classList.remove('on-pitch'));
+        }
 
-    const FORMATIONS = {
-        '4-3-3':   [[.5,.92],[.2,.72],[.4,.72],[.6,.72],[.8,.72],[.25,.52],[.5,.52],[.75,.52],[.15,.28],[.5,.28],[.85,.28]],
-        '4-4-2':   [[.5,.92],[.2,.72],[.4,.72],[.6,.72],[.8,.72],[.2,.52],[.4,.52],[.6,.52],[.8,.52],[.35,.25],[.65,.25]],
-        '3-5-2':   [[.5,.92],[.25,.74],[.5,.74],[.75,.74],[.15,.52],[.35,.52],[.55,.52],[.75,.52],[.9,.52],[.35,.25],[.65,.25]],
-        '4-2-3-1': [[.5,.92],[.2,.72],[.4,.72],[.6,.72],[.8,.72],[.35,.55],[.65,.55],[.2,.35],[.5,.35],[.8,.35],[.5,.18]],
-        '5-3-2':   [[.5,.92],[.1,.72],[.3,.72],[.5,.72],[.7,.72],[.9,.72],[.25,.50],[.5,.50],[.75,.50],[.35,.25],[.65,.25]],
-    };
-
-    const POS_LABELS = ['GK','CB','CB','LB','RB','CDM','CM','CM','LW','RW','ST'];
-    const W = 340, H = 520;
-
-    let currentFormation = '4-3-3';
-    let slotAssignments = {};
-    let draggingId = null, draggingFrom = null;
-
-    const svg = document.getElementById('pitchSvg');
-
-    const PLAYERS = Array.from(document.querySelectorAll('.player-card')).map(c => ({
-        id: c.dataset.pid,
-        name: c.dataset.name,
-        pos: c.dataset.pos,
-        rating: c.dataset.rating,
-    }));
-
-    function updateCount() {
-        const placed = Object.keys(slotAssignments).length;
-        document.getElementById('squadCount').textContent =
-            placed ? `${placed} / 11 placed` : `${PLAYERS.length} players`;
-    }
-
-    function pitchBg() {
-        return `<image href="/images/Soccer_thirds.png" x="0" y="0" width="${W}" height="${H}" preserveAspectRatio="xMidYMid slice"/>`;
-    }
-
-    function render() {
-        const slots = FORMATIONS[currentFormation].map(([rx, ry]) => ({ x: rx * W, y: ry * H }));
-        let html = pitchBg();
-
-        slots.forEach((s, i) => {
-            const pid = slotAssignments[i];
-            const player = pid ? PLAYERS.find(p => p.id === pid) : null;
-
-            if (!player) {
-                html += `
-                <g data-slot="${i}">
-                    <circle cx="${s.x}" cy="${s.y}" r="20" fill="rgba(0,0,0,0.25)" stroke="white" stroke-dasharray="5 3"/>
-                    <text x="${s.x}" y="${s.y}" text-anchor="middle" dominant-baseline="middle"
-                          fill="white" font-size="9">${POS_LABELS[i] || ''}</text>
-                </g>`;
-            } else {
-                const inits = player.name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
-                const short = player.name.split(' ').pop();
-
-                html += `
-                <g class="player-token" data-slot="${i}" data-token="${player.id}" draggable="true">
-                    <circle cx="${s.x}" cy="${s.y}" r="20" fill="#1D9E75" stroke="white" stroke-width="2"/>
-                    <text x="${s.x}" y="${s.y}" text-anchor="middle" font-size="9" fill="white">${inits}</text>
-                    <text x="${s.x}" y="${s.y + 26}" text-anchor="middle" font-size="8" fill="white">${short}</text>
-                </g>`;
-            }
-        });
-
-        svg.innerHTML = html;
-
-        svg.querySelectorAll('[data-slot]').forEach(el => {
-            el.addEventListener('dragover', e => e.preventDefault());
-            el.addEventListener('drop', e => {
-                e.preventDefault();
-                const slotIdx = parseInt(el.dataset.slot);
-                if (draggingId == null) return;
-
-                if (draggingFrom !== 'squad')
-                    delete slotAssignments[parseInt(draggingFrom)];
-
-                slotAssignments[slotIdx] = draggingId;
-
-                draggingId = null;
-                draggingFrom = null;
-
-                render();
-                syncSquad();
-                updateCount();
+        document.querySelectorAll('#formationBar button').forEach(b => {
+            b.addEventListener('click', () => {
+                document.querySelectorAll('#formationBar button').forEach(x => x.classList.remove('active'));
+                b.classList.add('active');
+                renderSlots(b.dataset.f);
             });
         });
 
-        svg.querySelectorAll('.player-token').forEach(g => {
-            g.addEventListener('dragstart', () => {
-                draggingId = g.dataset.token;
-                draggingFrom = g.dataset.slot;
+        document.addEventListener('dragstart', e => {
+            const card = e.target.closest('.pcard');
+            if (!card) return;
+            e.dataTransfer.setData('text/plain', card.dataset.id);
+        });
+
+        document.getElementById('clearPitch').addEventListener('click', () => {
+            renderSlots(formationLabel.textContent);
+        });
+
+        document.getElementById('rosterSearch').addEventListener('input', e => {
+            const q = e.target.value.toLowerCase();
+            document.querySelectorAll('#squadList .pcard').forEach(c => {
+                c.style.display = c.dataset.name.toLowerCase().includes(q) ? '' : 'none';
             });
         });
-    }
-
-    function syncSquad() {
-        const assigned = Object.values(slotAssignments);
-        document.querySelectorAll('.player-card').forEach(c => {
-            c.classList.toggle('on-pitch', assigned.includes(c.dataset.pid));
+                renderSlots('@Model.Formation');
+        document.querySelectorAll('#formationBar button').forEach(b => {
+            if (b.dataset.f === '@Model.Formation') b.classList.add('active');
+            else b.classList.remove('active');
         });
-    }
 
-    document.querySelectorAll('.player-card').forEach(card => {
-        card.addEventListener('dragstart', () => {
-            draggingId = card.dataset.pid;
-            draggingFrom = 'squad';
+                        document.getElementById('saveFormation').addEventListener('click', () => {
+            const formation = formationLabel.textContent.trim();
+            fetch('/Squad/SaveFormation', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formation)
+            }).then(r => {
+                const msg = document.getElementById('saveMsg');
+                msg.style.display = 'block';
+                msg.style.color = r.ok ? '#00d97e' : '#ff4d4f';
+                msg.textContent = r.ok ? 'Formation saved!' : 'Failed to save.';
+                setTimeout(() => msg.style.display = 'none', 2000);
+            });
         });
-    });
-
-    document.getElementById('formationBar').querySelectorAll('.fmt-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            currentFormation = btn.dataset.fmt;
-            slotAssignments = {};
-            document.querySelectorAll('.fmt-btn').forEach(b => b.classList.toggle('active', b === btn));
-            render();
-            syncSquad();
-            updateCount();
-        });
-    });
-
-    document.getElementById('clearPitch').addEventListener('click', () => {
-        slotAssignments = {};
-        render();
-        syncSquad();
-        updateCount();
-    });
-
-    render();
-    updateCount();
-</script>
+    </script>
+}

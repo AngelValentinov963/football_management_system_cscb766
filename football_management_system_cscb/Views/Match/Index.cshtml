@@ -464,8 +464,8 @@
     let interval = null;
     let lastHome = 0, lastAway = 0;
 
-    function startMatch() {
-        window.location.href = '/Match/Start?homeId=2&awayId=3';
+        function startMatch() {
+        window.location.href = '/Match/Start?homeId=@ViewBag.HomeId&awayId=@ViewBag.AwayId&fixtureId=@ViewBag.FixtureId';
     }
 
     function bump(id) {

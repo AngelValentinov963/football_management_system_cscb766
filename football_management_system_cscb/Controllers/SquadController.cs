@@ -2,6 +2,7 @@
 using football_management_system_cscb.ViewModel;
 using football_management_system_cscb.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace football_management_system_cscb.Controllers
 {
@@ -41,15 +42,35 @@ namespace football_management_system_cscb.Controllers
                 })
                 .ToList();
 
+            var team = _context.Teams.FirstOrDefault(t => t.TeamId == user.TeamId.Value);
+
             var model = new SquadViewModel
             {
                 TeamId = user.TeamId.Value,
                 Squad = players,
                 StartingXI = new List<PlayerViewModel>(),
-                Formation = "4-3-3"
+                Formation = team?.DefaultFormation ?? "4-3-3"
             };
 
             return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveFormation([FromBody] string formation)
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null) return Unauthorized();
+
+            var user = await _context.Users.FindAsync(userId.Value);
+            if (user?.TeamId == null) return BadRequest();
+
+            var team = await _context.Teams.FindAsync(user.TeamId.Value);
+            if (team == null) return NotFound();
+
+            team.DefaultFormation = formation;
+            await _context.SaveChangesAsync();
+
+            return Ok();
         }
     }
 }

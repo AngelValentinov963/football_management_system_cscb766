@@ -36,14 +36,35 @@ public class MatchController : Controller
     {
         var state = _session.Load();
 
-        if (state == null)
+        if (state != null)
+        {
+            ViewBag.HomeTeam = await _db.Teams.FirstOrDefaultAsync(t => t.TeamId == state.HomeTeamId);
+            ViewBag.AwayTeam = await _db.Teams.FirstOrDefaultAsync(t => t.TeamId == state.AwayTeamId);
+            ViewBag.HomeId = state.HomeTeamId;
+            ViewBag.AwayId = state.AwayTeamId;
+            ViewBag.FixtureId = HttpContext.Session.GetInt32("fixtureId") ?? 0;
             return View();
+        }
 
-        ViewBag.HomeTeam = await _db.Teams
-            .FirstOrDefaultAsync(t => t.TeamId == state.HomeTeamId);
+        var userId = HttpContext.Session.GetInt32("UserId");
+        var user = userId != null ? await _db.Users.FindAsync(userId.Value) : null;
 
-        ViewBag.AwayTeam = await _db.Teams
-            .FirstOrDefaultAsync(t => t.TeamId == state.AwayTeamId);
+        if (user?.TeamId != null)
+        {
+            var fixture = await _db.Fixtures
+                .Where(f => !f.Played && (f.HomeTeamId == user.TeamId || f.AwayTeamId == user.TeamId))
+                .OrderBy(f => f.Week)
+                .FirstOrDefaultAsync();
+
+            if (fixture != null)
+            {
+                ViewBag.HomeTeam = await _db.Teams.FirstOrDefaultAsync(t => t.TeamId == fixture.HomeTeamId);
+                ViewBag.AwayTeam = await _db.Teams.FirstOrDefaultAsync(t => t.TeamId == fixture.AwayTeamId);
+                ViewBag.HomeId = fixture.HomeTeamId;
+                ViewBag.AwayId = fixture.AwayTeamId;
+                ViewBag.FixtureId = fixture.Id;
+            }
+        }
 
         return View();
     }

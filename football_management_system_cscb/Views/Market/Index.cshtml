@@ -1,103 +1,464 @@
 @model football_management_system_cscb.ViewModels.MarketViewModel
-
 @{
     ViewData["Title"] = "Transfer Market";
 }
 
-<div class="page-header">
-    <div>
+@section Styles {
+    <style>
+        /* ===== Dark Market UI ===== */
+        .mk-wrap {
+            display: grid;
+            gap: 18px;
+            color: #e7ecf5;
+            min-width: 0;
+        }
+
+        .mk-hero {
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+            padding: clamp(20px, 2.4vw, 32px);
+            background: radial-gradient(900px 280px at -10% -30%, rgba(56,189,248,.18), transparent 60%), radial-gradient(700px 260px at 110% 130%, rgba(168,85,247,.18), transparent 60%), linear-gradient(180deg, #0f1830 0%, #0a1226 100%);
+            border: 1px solid rgba(255,255,255,.08);
+            box-shadow: 0 30px 60px -30px rgba(0,0,0,.6);
+        }
+
+            .mk-hero h1 {
+                margin: 0;
+                font-size: clamp(22px, 2.4vw, 32px);
+                font-weight: 800;
+                letter-spacing: .3px;
+            }
+
+            .mk-hero p {
+                margin: 4px 0 0;
+                color: #9fb0c9;
+                font-size: 13px;
+            }
+
+        .mk-kpis {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .kpi {
+            background: rgba(255,255,255,.04);
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 14px;
+            padding: 14px 16px;
+        }
+
+            .kpi .lbl {
+                font-size: 11px;
+                text-transform: uppercase;
+                letter-spacing: .12em;
+                color: #9fb0c9;
+            }
+
+            .kpi .val {
+                font-size: clamp(20px, 2vw, 28px);
+                font-weight: 800;
+                margin-top: 4px;
+            }
+
+            .kpi.budget .val {
+                background: linear-gradient(135deg,#34d399,#22d3ee);
+                -webkit-background-clip: text;
+                background-clip: text;
+                color: transparent;
+            }
+
+        .mk-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            gap: 18px;
+            min-width: 0;
+        }
+
+        @@media (max-width: 1100px) {
+            .mk-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .mk-card {
+            background: radial-gradient(700px 240px at -10% -20%, rgba(56,189,248,.10), transparent 60%), linear-gradient(180deg, #0f1830 0%, #0a1226 100%);
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 18px;
+            padding: 18px;
+            min-width: 0;
+            box-shadow: 0 30px 60px -30px rgba(0,0,0,.6);
+        }
+
+            .mk-card h2 {
+                margin: 0 0 4px;
+                font-size: clamp(16px, 1.6vw, 20px);
+                font-weight: 800;
+            }
+
+            .mk-card .sub {
+                color: #9fb0c9;
+                font-size: 12px;
+                margin-bottom: 12px;
+            }
+
+        .mk-search {
+            width: 100%;
+            background: rgba(255,255,255,.04);
+            border: 1px solid rgba(255,255,255,.1);
+            color: #e7ecf5;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+
+            .mk-search::placeholder {
+                color: #6b7c99;
+            }
+
+            .mk-search:focus {
+                outline: none;
+                border-color: rgba(56,189,248,.5);
+                box-shadow: 0 0 0 3px rgba(56,189,248,.15);
+            }
+
+        .mk-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 8px;
+        }
+
+            .mk-table thead th {
+                text-align: left;
+                font-size: 11px;
+                text-transform: uppercase;
+                letter-spacing: .12em;
+                color: #9fb0c9;
+                padding: 6px 12px;
+                font-weight: 600;
+            }
+
+            .mk-table tbody tr {
+                background: rgba(255,255,255,.03);
+                transition: background .15s ease, transform .15s ease;
+            }
+
+                .mk-table tbody tr:hover {
+                    background: rgba(255,255,255,.06);
+                    transform: translateY(-1px);
+                }
+
+            .mk-table td {
+                padding: 10px 12px;
+                border-top: 1px solid rgba(255,255,255,.05);
+                border-bottom: 1px solid rgba(255,255,255,.05);
+                vertical-align: middle;
+            }
+
+                .mk-table td:first-child {
+                    border-left: 1px solid rgba(255,255,255,.05);
+                    border-top-left-radius: 12px;
+                    border-bottom-left-radius: 12px;
+                }
+
+                .mk-table td:last-child {
+                    border-right: 1px solid rgba(255,255,255,.05);
+                    border-top-right-radius: 12px;
+                    border-bottom-right-radius: 12px;
+                    text-align: right;
+                }
+
+        .player-cell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg,#22d3ee,#3b82f6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: #04111f;
+            font-size: 13px;
+        }
+
+        .pname {
+            font-weight: 600;
+            color: #eaf2ff;
+        }
+
+        .pmeta {
+            font-size: 11px;
+            color: #9fb0c9;
+        }
+
+        .pos-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .04em;
+        }
+
+        .pos-GK {
+            background: rgba(251,191,36,.15);
+            color: #fde68a;
+            border: 1px solid rgba(251,191,36,.35);
+        }
+
+        .pos-DEF {
+            background: rgba(59,130,246,.15);
+            color: #bfdbfe;
+            border: 1px solid rgba(59,130,246,.35);
+        }
+
+        .pos-MID {
+            background: rgba(34,197,94,.15);
+            color: #bbf7d0;
+            border: 1px solid rgba(34,197,94,.35);
+        }
+
+        .pos-ATT {
+            background: rgba(239,68,68,.15);
+            color: #fecaca;
+            border: 1px solid rgba(239,68,68,.35);
+        }
+
+        .price {
+            font-weight: 800;
+            color: #86efac;
+            white-space: nowrap;
+        }
+
+        .btn-buy, .btn-sell {
+            border: none;
+            cursor: pointer;
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 12px;
+            transition: transform .15s ease, box-shadow .15s ease, opacity .2s;
+        }
+
+        .btn-buy {
+            background: linear-gradient(135deg, #22d3ee, #3b82f6);
+            color: #04111f;
+        }
+
+            .btn-buy:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 10px 24px -10px rgba(56,189,248,.6);
+            }
+
+            .btn-buy:disabled {
+                background: rgba(255,255,255,.06);
+                color: #6b7c99;
+                cursor: not-allowed;
+                transform: none;
+                box-shadow: none;
+            }
+
+        .btn-sell {
+            background: rgba(239,68,68,.15);
+            color: #fecaca;
+            border: 1px solid rgba(239,68,68,.35);
+        }
+
+            .btn-sell:hover {
+                background: rgba(239,68,68,.25);
+            }
+
+        .empty {
+            text-align: center;
+            padding: 30px 0;
+            color: #6b7c99;
+            font-size: 13px;
+        }
+
+        .alert-success {
+            background: rgba(34,197,94,.12);
+            border: 1px solid rgba(34,197,94,.3);
+            color: #86efac;
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+
+        .alert-error {
+            background: rgba(239,68,68,.12);
+            border: 1px solid rgba(239,68,68,.3);
+            color: #fca5a5;
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+    </style>
+}
+
+@functions {
+    string PosGroup(string pos)
+    {
+        if (string.IsNullOrEmpty(pos)) return "MID";
+        var p = pos.ToUpper();
+        if (p.Contains("GK")) return "GK";
+        if (p.Contains("CB") || p.Contains("LB") || p.Contains("RB") || p.Contains("WB") || p == "DEF") return "DEF";
+        if (p.Contains("ST") || p.Contains("CF") || p.Contains("LW") || p.Contains("RW") || p == "ATT" || p == "FW") return "ATT";
+        return "MID";
+    }
+}
+
+<div class="mk-wrap">
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert-success">✓ @TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert-error">✕ @TempData["Error"]</div>
+    }
+
+    <div class="mk-hero">
         <h1>Transfer Market</h1>
-        <p class="subtitle">
-            @Model.Team.Name — Budget: €@string.Format("{0:N0}", Model.Team.Budget)
-        </p>
+        <p>Build your dynasty. Scout, negotiate, and sign the talent that changes a season.</p>
+        <div class="mk-kpis">
+            <div class="kpi budget">
+                <div class="lbl">Available Budget</div>
+                <div class="val">€@string.Format("{0:N0}", Model.Team.Budget)</div>
+            </div>
+            <div class="kpi">
+                <div class="lbl">Squad Size</div>
+                <div class="val">@Model.MyPlayers.Count</div>
+            </div>
+            <div class="kpi">
+                <div class="lbl">Listings</div>
+                <div class="val">@Model.AvailablePlayers.Count</div>
+            </div>
+            <div class="kpi">
+                <div class="lbl">Window</div>
+                <div class="val" style="font-size:16px; color:#fde68a;">OPEN</div>
+            </div>
+        </div>
     </div>
-</div>
 
-<!-- ================= MY PLAYERS ================= -->
-<h2>My Squad</h2>
+    <div class="mk-grid">
 
-<div class="player-table card mb-4">
-    <div class="table-responsive scroll-table">
-        <table class="table table-hover align-middle mb-0">
-            <thead>
-                <tr>
-                    <th>Player</th>
-                    <th>Age</th>
-                    <th>Nationality</th>
-                    <th>Position</th>
-                    <th>Value</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                @if (Model.MyPlayers == null || !Model.MyPlayers.Any())
-                {
-                    <tr>
-                        <td colspan="5" class="text-muted">No players in your squad.</td>
-                    </tr>
-                }
-                else
-                {
-                    foreach (var player in Model.MyPlayers)
+        <!-- My Squad -->
+        <div class="mk-card">
+            <h2>My Squad</h2>
+            <div class="sub">Sell players you no longer need</div>
+            <input class="mk-search" data-filter="#mySquadBody" placeholder="Search your squad..." />
+            <table class="mk-table">
+                <thead>
+                    <tr><th>Player</th><th>Pos</th><th>Rating</th><th style="text-align:right">Action</th></tr>
+                </thead>
+                <tbody id="mySquadBody">
+                    @if (!Model.MyPlayers.Any())
                     {
-                        <tr>
-                            <td><strong>@player.FullName</strong></td>
-                            <td>@(DateTime.Today.Year - player.BirthDate.Year)</td>
-                            <td>@player.Nationality</td>
-                            <td>@player.PreferredPosition</td>
-                            <td>€@string.Format("{0:N0}", player.MarketValue ?? 0)</td>
-                        </tr>
+                        <tr><td colspan="4" class="empty">No players in your squad yet.</td></tr>
                     }
-                }
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<!-- ================= TRANSFER MARKET ================= -->
-<h2>Available Players</h2>
-
-<div class="player-table card">
-    <div class="table-responsive scroll-table">
-        <table class="table table-hover align-middle mb-0">
-            <thead>
-                <tr>
-                    <th>Player</th>
-                    <th>Age</th>
-                    <th>Nationality</th>
-                    <th>Position</th>
-                    <th>Price</th>
-                    <th></th>
-                </tr>
-            </thead>
-
-            <tbody>
-                @if (Model.AvailablePlayers == null || !Model.AvailablePlayers.Any())
-                {
-                    <tr>
-                        <td colspan="6" class="text-muted">No players available on the market.</td>
-                    </tr>
-                }
-                else
-                {
-                    foreach (var player in Model.AvailablePlayers)
+                    else
                     {
-                        <tr>
-                            <td><strong>@player.FullName</strong></td>
-                            <td>@(DateTime.Today.Year - player.BirthDate.Year)</td>
-                            <td>@player.Nationality</td>
-                            <td>@player.PreferredPosition</td>
-                            <td>€@string.Format("{0:N0}", player.MarketValue ?? 0)</td>
-                            <td>
-                                <form asp-action="Buy" method="post">
-                                    <input type="hidden" name="playerId" value="@player.PlayerId" />
-                                    <button class="btn btn-success btn-sm">Buy</button>
-                                </form>
-                            </td>
-                        </tr>
+                        foreach (var p in Model.MyPlayers)
+                        {
+                            var grp = PosGroup(p.PreferredPosition);
+                            var age = DateTime.Today.Year - p.BirthDate.Year;
+                            <tr data-name="@p.FullName">
+                                <td>
+                                    <div class="player-cell">
+                                        <div class="avatar">@p.FullName[0]</div>
+                                        <div>
+                                            <div class="pname">@p.FullName</div>
+                                            <div class="pmeta">Age @age · @p.Nationality</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="pos-badge pos-@grp">@p.PreferredPosition</span></td>
+                                <td><strong>@p.OverallRating</strong></td>
+                                <td>
+                                    <form asp-action="Sell" method="post" style="display:inline;">
+                                        <input type="hidden" name="playerId" value="@p.PlayerId" />
+                                        <button type="submit" class="btn-sell">Sell</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
                     }
-                }
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Market -->
+        <div class="mk-card">
+            <h2>Available on Market</h2>
+            <div class="sub">Sign new talent to strengthen your side</div>
+            <input class="mk-search" data-filter="#marketBody" placeholder="Search market..." />
+            <table class="mk-table">
+                <thead>
+                    <tr><th>Player</th><th>Pos</th><th>Price</th><th style="text-align:right">Action</th></tr>
+                </thead>
+                <tbody id="marketBody">
+                    @if (!Model.AvailablePlayers.Any())
+                    {
+                        <tr><td colspan="4" class="empty">No listings at the moment.</td></tr>
+                    }
+                    else
+                    {
+                        foreach (var p in Model.AvailablePlayers)
+                        {
+                            var grp = PosGroup(p.PreferredPosition);
+                            var price = p.MarketValue ?? 0;
+                            var canAfford = price <= Model.Team.Budget;
+                            <tr data-name="@p.FullName">
+                                <td>
+                                    <div class="player-cell">
+                                        <div class="avatar">@p.FullName[0]</div>
+                                        <div>
+                                            <div class="pname">@p.FullName</div>
+                                            <div class="pmeta">Rating @p.OverallRating</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="pos-badge pos-@grp">@p.PreferredPosition</span></td>
+                                <td><span class="price">€@string.Format("{0:N0}", price)</span></td>
+                                <td>
+                                    <form asp-action="Buy" method="post" style="display:inline;">
+                                        <input type="hidden" name="playerId" value="@p.PlayerId" />
+                                        <button type="submit" class="btn-buy" @(canAfford ? "" : "disabled")>
+                                            @(canAfford ? "Buy" : "No funds")
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('.mk-search').forEach(inp => {
+            inp.addEventListener('input', e => {
+                const q = e.target.value.toLowerCase();
+                const target = document.querySelector(inp.dataset.filter);
+                if (!target) return;
+                target.querySelectorAll('tr[data-name]').forEach(r => {
+                    r.style.display = r.dataset.name.toLowerCase().includes(q) ? '' : 'none';
+                });
+            });
+        });
+    </script>
+}

@@ -17,5 +17,8 @@
         public int? Potential { get; set; }
 
         public decimal? MarketValue { get; set; }
+
+
+        public bool IsListedForTransfer { get; set; }
     }
 }

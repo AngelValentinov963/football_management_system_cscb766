@@ -9,7 +9,6 @@
 @section Styles {
     <style>
 
-        /* Table for the laderboard*/
         .league-table {
             width: 100%;
             border-collapse: collapse;
@@ -41,17 +40,15 @@
             align-items: center;
             gap: 8px;
         }
-        /* ===== FM Dashboard (sidebar-safe, shrink-to-fit) ===== */
 
-        /* 🔧 Root container — never exceeds the main content area */
         .fm-dash {
             display: grid;
             gap: 18px;
             width: 100%;
             max-width: 100%;
-            min-width: 0; /* allow grid children to shrink */
+            min-width: 0;
             box-sizing: border-box;
-            overflow: hidden; /* kill any horizontal bleed */
+            overflow: hidden;
         }
 
             .fm-dash *,
@@ -61,7 +58,6 @@
                 min-width: 0;
             }
 
-        /* Hero */
         .fm-hero {
             position: relative;
             overflow: hidden;
@@ -210,7 +206,6 @@
                 color: #fff;
             }
 
-        /* KPI grid — auto-fit so it never overflows */
         .fm-kpis {
             display: grid;
             gap: 14px;
@@ -282,7 +277,6 @@
                 border-color: rgba(244,114,182,.3);
             }
 
-        /* Section heading */
         .fm-section-head {
             display: flex;
             align-items: flex-end;
@@ -305,7 +299,6 @@
                 text-transform: uppercase;
             }
 
-        /* Carousel — width capped to its grid cell */
         .fm-carousel-wrap {
             position: relative;
             width: 100%;
@@ -315,7 +308,7 @@
         .fm-carousel {
             display: grid;
             grid-auto-flow: column;
-            grid-auto-columns: minmax(220px, 260px);
+            grid-auto-columns: calc((100% - 3 * 14px) / 4);
             gap: 14px;
             overflow-x: auto;
             overflow-y: hidden;
@@ -443,7 +436,6 @@
                 right: -4px;
             }
 
-        /* Lower 2-col panels */
         .fm-grid-2 {
             display: grid;
             gap: 16px;
@@ -484,7 +476,6 @@
                     padding-right: 4px;
                 }
 
-        /* Form rows */
         .fm-form-row {
             display: flex;
             align-items: center;
@@ -548,7 +539,6 @@
                 background: #dc2626;
             }
 
-        /* News */
         .fm-news {
             margin: 0;
             padding: 0;
@@ -609,12 +599,13 @@
             }
     </style>
 }
+
 <div class="fm-dash">
+
     <!-- Lower panels -->
     <section class="fm-grid-2">
         <div class="fm-panel compact">
             <h3>League Table</h3>
-
             <div class="body">
                 <table class="league-table">
                     <thead>
@@ -630,7 +621,6 @@
                             <th>Pts</th>
                         </tr>
                     </thead>
-
                     <tbody>
                         @if (table != null)
                         {
@@ -641,7 +631,6 @@
                                         <img src="@t.LogoUrl" style="width:18px;height:18px;border-radius:4px;margin-right:6px;" />
                                         @t.TeamName
                                     </td>
-
                                     <td>@t.Played</td>
                                     <td>@t.Wins</td>
                                     <td>@t.Draws</td>
@@ -659,7 +648,6 @@
         </div>
         <div class="fm-panel compact">
             <h3>News Feed</h3>
-
             <div class="body">
                 <ul class="fm-news">
                     <li><span class="tag">Match</span><div>Top of the table clash this weekend — dial in your tactics.<time>Today</time></div></li>
@@ -705,16 +693,20 @@
             <button class="fm-carousel-btn prev" onclick="fmScroll(-1)" aria-label="Prev">‹</button>
             <button class="fm-carousel-btn next" onclick="fmScroll(1)" aria-label="Next">›</button>
             <div class="fm-carousel" id="fmCarousel">
-                <a class="fm-card" href="/Teams">
-                    <div><div class="ico">🛡️</div><h3>Teams</h3><p>Manage clubs, ratings and league standings.</p></div>
-                    <span class="go">Enter →</span>
-                </a>
-                <a class="fm-card v-blue" href="/Players">
-                    <div><div class="ico">👤</div><h3>Players</h3><p>Browse the global player pool and scout talent.</p></div>
+                <a class="fm-card v-violet" href="/Match">
+                    <div><div class="ico">🏟️</div><h3>Play Match</h3><p>Simulate your next fixture live.</p></div>
                     <span class="go">Enter →</span>
                 </a>
                 <a class="fm-card v-amber" href="/Squad">
                     <div><div class="ico">⚽</div><h3>Squad &amp; Tactics</h3><p>Pick your starting eleven and set formation.</p></div>
+                    <span class="go">Enter →</span>
+                </a>
+                <a class="fm-card" href="/Teams">
+                    <div><div class="ico">🛡️</div><h3>Teams</h3><p>Manage clubs, ratings and league standings.</p></div>
+                    <span class="go">Enter →</span>
+                </a>
+                <a class="fm-card v-blue" href="/Player">
+                    <div><div class="ico">👤</div><h3>Players</h3><p>Browse the global player pool and scout talent.</p></div>
                     <span class="go">Enter →</span>
                 </a>
                 <a class="fm-card v-rose" href="/Market">
@@ -725,12 +717,9 @@
                     <div><div class="ico">📅</div><h3>Fixtures</h3><p>See every match-week and the next kick-off.</p></div>
                     <span class="go">Enter →</span>
                 </a>
-                
             </div>
         </div>
     </section>
-
-    
 
 </div>
 
@@ -739,19 +728,23 @@
         (function(){
             const t = document.getElementById('fmClock');
             const d = document.getElementById('fmDate');
-            function tick(){
-                const n = new Date();
-                t.textContent = n.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-                d.textContent = n.toLocaleDateString([], {weekday:'short', day:'2-digit', month:'short', year:'numeric'});
+            if(t && d){
+                function tick(){
+                    const n = new Date();
+                    t.textContent = n.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+                    d.textContent = n.toLocaleDateString([], {weekday:'short', day:'2-digit', month:'short', year:'numeric'});
+                }
+                tick(); setInterval(tick, 30000);
             }
-            tick(); setInterval(tick, 30000);
         })();
 
         function fmScroll(dir){
             const el = document.getElementById('fmCarousel');
             if(!el) return;
-            const step = el.clientWidth * 0.7;
-            el.scrollBy({ left: dir * step, behavior:'smooth' });
+            const card = el.querySelector('.fm-card');
+            if(!card) return;
+            const cardWidth = card.offsetWidth + 14;
+            el.scrollBy({ left: dir * cardWidth, behavior:'smooth' });
         }
 
         (function(){

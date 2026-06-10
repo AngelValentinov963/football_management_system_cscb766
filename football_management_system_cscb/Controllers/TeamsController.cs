@@ -43,21 +43,7 @@ public class TeamsController : Controller
         return View();
     }
 
-    // POST: TEAMS/Create
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("TeamId,Name,City")] Team team)
-    {
-        if (ModelState.IsValid)
-        {
-            _context.Add(team);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-        return View(team);
-    }
+ 
 
     // GET: TEAMS/Edit/5
     public async Task<IActionResult> Edit(int? teamid)
@@ -156,15 +142,11 @@ public class TeamsController : Controller
         if (userId == null)
             return Unauthorized();
 
-        var user = _context.Users
-            .FirstOrDefault(u => u.UserId == userId.Value);
+        var user = _context.Users.Find(userId.Value);
 
         if (user == null)
             return Unauthorized();
-        if (user.TeamId != null)
-        {
-            return BadRequest("Team already selected.");
-        }
+
         user.TeamId = teamId;
 
         _context.SaveChanges();
