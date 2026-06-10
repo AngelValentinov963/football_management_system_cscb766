@@ -2,6 +2,8 @@
 
 A web-based football management simulation built with ASP.NET Core MVC. Users can manage a club, set tactics, navigate the transfer market, simulate live matches, and track league standings across a full season.
 
+Made for CSCB766 at NBU
+
 ---
 
 ## Features
