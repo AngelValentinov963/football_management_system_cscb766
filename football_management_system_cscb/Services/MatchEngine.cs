@@ -15,9 +15,7 @@ public class MatchEngine
         _formationMatchup = formationMatchup;
     }
 
-    // ==========================
-    // START MATCH
-    // ==========================
+   
     public MatchState StartMatch()
     {
         return new MatchState

@@ -25,7 +25,7 @@ public class MatchController : Controller
         _engine = engine;
         _db = db;
         _session = session;
-        _squadService = squadService; // ✅ ASSIGN IT
+        _squadService = squadService;
 
     }
 
